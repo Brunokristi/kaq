@@ -1,7 +1,7 @@
 <template>
   <div class="contact-page">
     <h3>Contact Us</h3>
-    <form>
+    <form @submit.prevent="handleSubmit">
         <div class="field-holder">
             <input type="text" class="form-control" id="name" required>
             <label for="name">Name</label>
@@ -31,6 +31,8 @@
 </template>
 
 <script>
+import emailjs from 'emailjs-com';
+
 export default {
   name: 'ContactPage',
   data() {
@@ -43,12 +45,33 @@ export default {
     };
   },
   methods: {
-    handleSubmit() {
-      alert(`Thank you, ${this.formData.name}, for reaching out!`);
-      // Reset form
-      this.formData = { name: '', email: '', message: '' };
+    async sendEmail() {
+    if (!this.formData.name || !this.formData.email || !this.formData.message) {
+        alert("Please fill out all fields.");
+        return;
+    }
+
+    try {
+        await emailjs.send(
+        "YOUR_SERVICE_ID", // Replace with your EmailJS Service ID
+        "YOUR_TEMPLATE_ID", // Replace with your EmailJS Template ID
+        {
+            from_name: this.formData.name,
+            from_email: this.formData.email,
+            message: this.formData.message,
+        },
+        "YOUR_USER_ID" // Replace with your EmailJS User ID
+        );
+
+        alert("Message sent successfully!");
+        this.formData = { name: "", email: "", message: "" }; // Reset form
+    } catch (error) {
+        console.error("Error sending email:", error);
+        alert("Failed to send message. Please try again.");
+    }
     },
   },
+
 };
 </script>
 
