@@ -1,7 +1,7 @@
 <nav class="navbar fixed-bottom navbar-light justify-content-end">
     <button>Docs</button>
     <a href="{{ route('contact') }}" class="navbar-link">Get in Touch</a>
-    <button>Our Mission</button>
+    <a href="{{ route('mission') }}" class="navbar-link">Our Mission</a>
 </nav>
 
 <style>

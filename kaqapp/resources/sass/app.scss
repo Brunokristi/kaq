@@ -232,3 +232,43 @@
         text-align: center;
     }
 }
+
+.mission {
+    .image-holder {
+        position: relative;
+        width: 48%;
+        height: 350px;
+    }
+
+    .image-holder img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border: solid 1px #000;
+    }
+
+    .image-holder .overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10;
+    }
+
+    .text-holder {
+        line-height: normal;
+    }
+
+    .text-rotate {
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        text-align: center;
+        padding-left: 1rem;
+        margin: 0;
+    }
+
+    a {
+        color: #47663B;
+        text-decoration: none;
+    }
+}
