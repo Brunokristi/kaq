@@ -14,3 +14,7 @@ Route::get('/mission', function () {
 
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 Route::post('/contact', [ContactController::class, 'submit'])->name('contact.submit');
+
+Route::get('/create', function () {
+    return view('dashboard');
+})->name('create');

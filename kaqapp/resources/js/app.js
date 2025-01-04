@@ -17,5 +17,3 @@ import './bootstrap';
  * an "id" attribute of "app". This element is included with the "auth"
  * scaffolding. Otherwise, you will need to add an element yourself.
  */
-
-app.mount('#app');

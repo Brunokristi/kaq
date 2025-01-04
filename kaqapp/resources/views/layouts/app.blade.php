@@ -12,13 +12,14 @@
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" defer></script>
+
     
     <!-- Vite -->
     @vite(['resources/js/app.js'])
     @vite('resources/sass/app.scss')
 
 </head>
-<body>
+<body class="{{ Route::is('create') ? 'create' : '' }}">
     <!-- Top Navbar -->
     <x-app-navbar />
     
@@ -45,7 +46,7 @@ h1, h2, h3 {
 }
 
 h2 {
-    font-size: 0.9rem !important;
+    font-size: 1rem !important;
     font-weight: 400 !important;
 }
 
@@ -54,7 +55,7 @@ h1 {
 }
 
 h3 {
-    font-size: 1rem !important;
+    font-size: 0.9rem !important;
     text-transform: uppercase;
 }
 

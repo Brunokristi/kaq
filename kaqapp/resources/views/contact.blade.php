@@ -5,7 +5,7 @@
 @section('content')
 <div class="contact">
     <div class="contact-page">
-        <h3>Contact Us</h3>
+        <h2>Contact Us</h2>
         <form action="{{ route('contact.submit') }}" method="POST">
             @csrf
             <div class="field-holder">
@@ -28,7 +28,7 @@
 
         @if(session('success'))
             <div class="success-message">
-                Message sent. We will get back to you soon.
+                Message sent. We will get back to you soon.  <br><a href="/">home <i class="bi bi-arrow-right"></i></a>
             </div>
         @endif
 
