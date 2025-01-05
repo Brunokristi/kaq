@@ -325,7 +325,11 @@ body.create {
     }
 
     .half-height {
-        height: calc(50vh - 46px);
+        height: 300px;
+    }
+
+    .rest {
+        height: calc(100vh - 392px);
     }
 
     .overflow-none {
@@ -441,5 +445,90 @@ body.create {
         width: 200px;
         height: 200px;
         object-fit: cover;
+    }
+
+    .btn-outline-primary {
+        color: #000;
+        border: 1px solid #000;
+        border-radius: 0;
+        font-size: 0.8rem;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .btn-outline-primary:hover {
+        color: #47663B;
+        border: 1px solid #47663B;
+    }
+
+    .btn-check:checked+.btn {
+        background-color: #000;
+        color: #fff;
+        border: 1px solid #000;
+    }
+
+    .btn-dark {
+        background-color: #000;
+        color: #fff;
+        border: 1px solid #000;
+        border-radius: 0;
+        font-size: 0.8rem;
+        font-family: 'Inter', sans-serif;
+        width: 100%;
+    }
+
+    .btn-dark:hover {
+        background-color: #47663B;
+        color: #fff;
+        border: 1px solid #47663B;
+    }
+
+    .style-label {
+        text-align: start;
+    }
+
+    .color-input {
+        border: none;
+    }
+
+    .color-input:active,
+    .color-input:focus {
+        border: none;
+    }
+
+    .slider {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 1px;
+        background: #000;
+        outline: none;
+        border-radius: 2px;
+        cursor: pointer;
+    }
+
+    .slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 10px;
+        height: 10px;
+        background: #000;
+        border-radius: 50%;
+        cursor: pointer;
+    }
+
+    .slider::-moz-range-thumb {
+        width: 10px;
+        height: 10px;
+        background: #000;
+        border-radius: 50%;
+        cursor: pointer;
+    }
+
+    .slider::-ms-thumb {
+        width: 10px;
+        height: 10px;
+        background: #000;
+        border-radius: 50%;
+        cursor: pointer;
     }
 }

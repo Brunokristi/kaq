@@ -66,11 +66,14 @@
 
             <!-- QR Code Section -->
             <div class="col-3 text-center p-0">
-                <div class="p-4 half-height overflow-auto">
-                    <img src="https://via.placeholder.com/150" alt="QR Code" class="img-fluid">
-                    <div class="d-flex align-items-center justify-content-between my-3">
+                <div class="p-4 half-height d-flex flex-column overflow-none">
+                    <div class="flex-grow-1 d-flex justify-content-center align-items-center">
+                        <img src="https://via.placeholder.com/150" alt="QR Code" class="img-fluid">
+                    </div>
+
+                    <div class="d-flex align-items-end justify-content-between my-3" style="gap: 1rem;">
                         <!-- Radio Toggle Buttons -->
-                        <div class="btn-group me-2" role="group" aria-label="Basic radio toggle button group">
+                        <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
                             <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
                             <label class="btn btn-outline-primary" for="btnradio1">PNG</label>
 
@@ -79,28 +82,28 @@
                         </div>
 
                         <!-- Standard Buttons -->
-                        <button class="btn btn-dark me-2">Download</button>
-                        <button class="btn btn-dark">Copy</button>
+                        <button class="btn btn-dark mb-0">Download</button>
+                        <button class="btn btn-dark mb-0">Copy</button>
                     </div>
                 </div>
 
-                <div class=" p-4 half-height overflow-auto bordered-top">
-                    <h5>STYLE</h5>
-                    <form>
-                        <div class="mb-3 d-flex align-items-center overflow-auto hafl-height">
-                            <label for="pixelColor" class="form-label me-2">Pixel color</label>
-                            <input type="color" class="color-input" id="pixelColor">
+                <div class="d-flex flex-column p-4 rest overflow-auto bordered-top align-items-start">
+                    <h3 class="mb-4">STYLE</h3>
+                    <form class="w-100">
+                        <div class="mb-3 d-flex flex-column">
+                            <label for="pixelColor" class="style-label">Pixel color</label>
+                            <input type="color" class="color-input w-100" id="pixelColor" value="#000000">
                         </div>
-                        <div class="mb-3 d-flex align-items-center">
-                            <label for="backgroundColor" class="form-label me-2">Background color</label>
-                            <input type="color" class="color-input" id="backgroundColor">
+                        <div class="mb-4 d-flex flex-column">
+                            <label for="backgroundColor" class="style-label">Background color</label>
+                            <input type="color" class="color-input w-100" id="backgroundColor" value="#ffffff">
                         </div>
-                        <div class="mb-3">
-                            <label for="pixelSize" class="form-label">Pixel size</label>
+                        <div class="mb-5 d-flex flex-column">
+                            <label for="pixelSize" class="style-label">Pixel size</label>
                             <input type="range" class="slider" id="pixelSize" min="1" max="10">
                         </div>
-                        <div class="mb-3">
-                            <label for="borderSize" class="form-label">Border size</label>
+                        <div class="mb-5 d-flex flex-column">
+                            <label for="borderSize" class="style-label">Border size</label>
                             <input type="range" class="slider" id="borderSize" min="1" max="10">
                         </div>
                     </form>
