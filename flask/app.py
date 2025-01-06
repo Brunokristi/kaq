@@ -6,8 +6,14 @@ from xml.etree import ElementTree as ET
 import zlib
 import lzma
 import struct
+import requests
+
 
 app = Flask(__name__)
+
+CLIENT_ID = "1025295778547-069622a895e1nd1srnknp1p8gv9h2c00.apps.googleusercontent.com"
+CLIENT_SECRET = "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"
+REDIRECT_URI = "https://kaqapp.com/oauth2callback"
 
 @app.route('/qrcode', methods=['GET'])
 def generate_qr():
@@ -783,6 +789,63 @@ def generate_recurring_event_qr():
     except Exception as e:
         return {"error": f"An unexpected error occurred: {e}"}, 500
 
+
+@app.route('/google_tasks_qr', methods=['GET'])
+def generate_google_tasks_qr():
+    # Google OAuth2 URL
+    oauth_url = (
+        f"https://accounts.google.com/o/oauth2/v2/auth?"
+        f"client_id={CLIENT_ID}&redirect_uri={REDIRECT_URI}"
+        f"&response_type=code&scope=https://www.googleapis.com/auth/tasks"
+    )
+
+    # Generate QR code for the OAuth URL
+    format = request.args.get('format', 'svg')  # Default QR code format
+    fill_color = request.args.get('fill', 'black')  # Default fill color
+    back_color = request.args.get('background', 'white')  # Default background color
+    box_size = int(request.args.get('box_size', 10))  # Default box size
+    border = int(request.args.get('border', 4))  # Default border size
+
+    # Generate and style the QR code
+    return styling(oauth_url, format, fill_color, back_color, box_size, border)
+
+
+@app.route('/oauth2callback', methods=['GET'])
+def oauth2callback():
+    # Get the authorization code from the callback
+    auth_code = request.args.get('code')
+    if not auth_code:
+        return {"error": "Authorization code is missing."}, 400
+
+    # Exchange the authorization code for an access token
+    token_url = "https://oauth2.googleapis.com/token"
+    token_data = {
+        "code": auth_code,
+        "client_id": CLIENT_ID,
+        "client_secret": CLIENT_SECRET,
+        "redirect_uri": REDIRECT_URI,
+        "grant_type": "authorization_code"
+    }
+
+    token_response = requests.post(token_url, data=token_data)
+    if token_response.status_code != 200:
+        return {"error": "Failed to retrieve access token."}, 400
+
+    access_token = token_response.json().get("access_token")
+
+    # Add a task using the Google Tasks API
+    tasks_url = "https://tasks.googleapis.com/tasks/v1/lists/@default/tasks"
+    task_data = {
+        "title": "Sample Task",
+        "notes": "This task was added via Google Tasks API."
+    }
+    headers = {"Authorization": f"Bearer {access_token}"}
+
+    task_response = requests.post(tasks_url, json=task_data, headers=headers)
+    if task_response.status_code != 200:
+        return {"error": "Failed to add task to Google Tasks."}, 400
+
+    return jsonify({"message": "Task added successfully!", "task": task_response.json()})
 
 
 
