@@ -19,7 +19,7 @@ REDIRECT_URI = "https://kaqapp.com/oauth2callback"
 def generate_qr():
     # Extract and validate parameters
     try:
-        data = request.args.get('data', 'https://www.parkfive.sk')
+        data = request.args.get('data', 'https://www.google.sk')
         format = request.args.get('format', 'png')
         fill_color = request.args.get('fill', 'black')
         back_color = request.args.get('background', 'white')
@@ -107,9 +107,6 @@ def generate_qr():
         return {"error": f"An unexpected error occurred: {e}"}, 500
 
 
-
-
-
 @app.route('/vcard', methods=['GET', 'POST'])
 def generate_vcard_with_photo():
     try:
@@ -127,7 +124,7 @@ def generate_vcard_with_photo():
         title = request_data.get('title', '')
         website = request_data.get('website', '')
         address = request_data.get('address', '')
-        photo_url = request_data.get('photo', '')  # URL or file path to the profile photo
+        photo_url = request_data.get('photo', '')
 
         # Generate vCard data
         vcard_data = f"""BEGIN:VCARD

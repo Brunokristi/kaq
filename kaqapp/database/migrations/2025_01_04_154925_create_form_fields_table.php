@@ -6,16 +6,16 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('qr_code_types', function (Blueprint $table) {
+        Schema::create('form_fields', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('category_id')->constrained()->cascadeOnDelete();
-            $table->string('name');
-            $table->text('description')->nullable();
+            $table->foreignId('qr_code_type_id')->constrained()->cascadeOnDelete();
+            $table->string('label');
+            $table->string('type');
+            $table->boolean('required')->default(false);
+            $table->string('placeholder')->nullable();
+            $table->string('value')->nullable();
             $table->timestamps();
         });
     }
@@ -25,6 +25,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('form_fields');
+        Schema::dropIfExists('qr_code_types');
     }
+    
 };

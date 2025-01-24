@@ -8,60 +8,22 @@
         <div class="row flex-grow-1">
 
             <div class="col-3 p-4 overflow-scroll full-height pt-3">
-                <h5>Contacts</h5>
-                <nav class="nav flex-column mb-4">
-                    <a class="nav-link" href="#">Vcard - digital business card</a>
-                    <a class="nav-link" href="#">Email</a>
-                    <a class="nav-link" href="#">Phone</a>
-                    <a class="nav-link" href="#">WhatsApp</a>
-                    <a class="nav-link" href="#">Discord</a>
-                    <a class="nav-link" href="#">Messenger</a>
-                    <a class="nav-link border" href="#">Complete Solution</a>
-                </nav>
-                <h5>Finances</h5>
-                <nav class="nav flex-column mb-4">
-                    <a class="nav-link" href="#">Vcard - online business card</a>
-                    <a class="nav-link" href="#">Email</a>
-                    <a class="nav-link" href="#">Phone</a>
-                    <a class="nav-link" href="#">WhatsApp</a>
-                    <a class="nav-link" href="#">Discord</a>
-                    <a class="nav-link" href="#">Messenger</a>
-                    <a class="nav-link border" href="#">Complete Solution</a>
-                </nav>
-                <h5>Finances</h5>
-                <nav class="nav flex-column mb-4">
-                    <a class="nav-link" href="#">Vcard - online business card</a>
-                    <a class="nav-link" href="#">Email</a>
-                    <a class="nav-link" href="#">Phone</a>
-                    <a class="nav-link" href="#">WhatsApp</a>
-                    <a class="nav-link" href="#">Discord</a>
-                    <a class="nav-link" href="#">Messenger</a>
-                    <a class="nav-link border" href="#">Complete Solution</a>
-                </nav>
+                 @foreach($categories as $category)
+                    <h5>{{ $category->name }}</h5>
+                    <nav class="nav flex-column mb-4">
+                        @foreach($category->qrCodeTypes as $type)
+                            <a class="nav-link" href="#" data-id="{{ $type->id }}">{{ $type->name }}</a>
+                        @endforeach
+                    </nav>
+                @endforeach
             </div>
 
             <!-- Main Content -->
             <div class="col-6 p-4 overflow-auto full-height bordered">
-                <h2>VCARD</h2>
-                <p class="trim" id="text">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed in aliquet orci. Sed consequat accumsan velit, et feugiat quam pretium vitae. Morbi vitae sapien turpis. Vestibulum a ligula est. Suspendisse pharetra mattis leo eu aliquet. Curabitur laoreet lorem leo, a elementum quam accumsan non. In at auctor ante, ut elementum leo. Nulla eu lobortis quam. Donec dapibus, felis malesuada suscipit vulputate, risus velit eleifend elit, sit amet porta massa felis et erat. Nam lobortis ultrices justo, in maximus enim feugiat ac. Donec nisi lacus, mollis vitae augue rhoncus, suscipit ullamcorper erat. Fusce quis dictum mi. Vivamus laoreet sapien ut euismod aliquam.
-                </p>
-                <button id="toggle-button" class="btn btn-link p-0">more</button>                
-                <h3 style="margin-bottom: 2rem;">DATA</h3>
-                <form>
-                    <div class="field-holder">
-                        <input type="text" class="form-control" id="name">
-                        <label for="name" class="form-label">Name</label>
-                    </div>
-                    <div class="field-holder">
-                        <input type="text" class="form-control" id="surname">
-                        <label for="surname" class="form-label">Surname</label>
-                    </div>
-                    <div class="field-holder">
-                        <input type="text" class="form-control" id="number">
-                        <label for="number" class="form-label">Number</label>
-                    </div>
-                </form>
+                <div id="main-content">
+                    <h2>Select a type to view its details</h2>
+                    <p>Click on a type from the sidebar to load content here.</p>
+                </div>
             </div>
 
             <!-- QR Code Section -->
@@ -114,34 +76,81 @@
 </div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const text = document.getElementById("text");
-        const toggleButton = document.getElementById("toggle-button");
+    document.addEventListener('DOMContentLoaded', () => {
+    // Attach click event to sidebar links
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', event => {
+            event.preventDefault(); // Prevent default link behavior
 
-        toggleButton.addEventListener("click", () => {
-            if (text.classList.contains("trim")) {
-                text.classList.remove("trim");
-                toggleButton.textContent = "less";
-            } else {
-                text.classList.add("trim");
-                toggleButton.textContent = "more";
-            }
+            const typeId = link.getAttribute('data-id'); // Get type ID
+
+            // Fetch content from API
+            fetch(`/api/types/${typeId}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Populate main content
+                    const mainContent = document.getElementById('main-content');
+                    mainContent.innerHTML = `
+                        <h2>${data.name}</h2>
+                        <div class="trim" id="text">
+                            ${data.description}
+                        </div>
+                        <button id="toggle-button" class="btn btn-link p-0">more</button> 
+                        <h3 style= "margin-bottom: 30px">DATA</h3>
+                        <form>
+                            ${data.form_fields.map(field => `
+                                <div class="field-holder">
+                                    <input 
+                                        type="${field.type}" 
+                                        class="form-control" 
+                                        id="${field.label.toLowerCase().replace(/\s+/g, '_')}" 
+                                        name="${field.label.toLowerCase().replace(/\s+/g, '_')}" 
+                                        ${field.required ? 'required' : ''}
+                                    >
+                                    <label for="${field.label.toLowerCase().replace(/\s+/g, '_')}" class="form-label">
+                                        ${field.label}
+                                    </label>
+                                </div>
+                            `).join('')}
+                        </form>
+                    `;
+
+                    // Attach the toggle button listener after content is updated
+                    const text = document.getElementById("text");
+                    const toggleButton = document.getElementById("toggle-button");
+
+                    toggleButton.addEventListener("click", () => {
+                        if (text.classList.contains("trim")) {
+                            text.classList.remove("trim");
+                            toggleButton.textContent = "less";
+                        } else {
+                            text.classList.add("trim");
+                            toggleButton.textContent = "more";
+                        }
+                    });
+
+                    document.querySelectorAll('.field-holder input, .field-holder textarea').forEach(field => {
+                        field.addEventListener('input', () => {
+                            if (field.value.trim() !== "") {
+                                field.classList.add('has-value');
+                            } else {
+                                field.classList.remove('has-value');
+                            }
+                        });
+
+                        // Initialize class on page load for prefilled values
+                        if (field.value.trim() !== "") {
+                            field.classList.add('has-value');
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching content:', error);
+                });
         });
-    });
+    });    
+});
 
-    document.querySelectorAll('.field-holder input, .field-holder textarea').forEach(field => {
-        field.addEventListener('input', () => {
-            if (field.value.trim() !== "") {
-                field.classList.add('has-value');
-            } else {
-                field.classList.remove('has-value');
-            }
-        });
 
-        // Initialize class on page load for prefilled values
-        if (field.value.trim() !== "") {
-            field.classList.add('has-value');
-        }
-    });
 </script>
 @endsection
