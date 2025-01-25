@@ -36,10 +36,10 @@
                     <div class="d-flex align-items-end justify-content-between my-3" style="gap: 1rem;">
                         <!-- Radio Toggle Buttons -->
                         <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
-                            <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
+                            <input type="radio" class="btn-check" name="btnradio" id="btnradio1" value="png" autocomplete="off" checked>
                             <label class="btn btn-outline-primary" for="btnradio1">PNG</label>
 
-                            <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
+                            <input type="radio" class="btn-check" name="btnradio" id="btnradio2" value="svg" autocomplete="off">
                             <label class="btn btn-outline-primary" for="btnradio2">SVG</label>
                         </div>
 
@@ -96,8 +96,8 @@
                             ${data.description}
                         </div>
                         <button id="toggle-button" class="btn btn-link p-0">more</button> 
-                        <h3 style= "margin-bottom: 30px">DATA</h3>
-                        <form>
+                        <h3 style="margin-bottom: 30px">DATA</h3>
+                        <form id="dynamic-form">
                             ${data.form_fields.map(field => `
                                 <div class="field-holder">
                                     <input 
@@ -129,26 +129,70 @@
                         }
                     });
 
-                    document.querySelectorAll('.field-holder input, .field-holder textarea').forEach(field => {
-                        field.addEventListener('input', () => {
-                            if (field.value.trim() !== "") {
-                                field.classList.add('has-value');
-                            } else {
-                                field.classList.remove('has-value');
-                            }
-                        });
-
-                        // Initialize class on page load for prefilled values
-                        if (field.value.trim() !== "") {
-                            field.classList.add('has-value');
-                        }
-                    });
+                    // Attach listeners to form fields for changes
+                    attachFormListeners(typeId);
                 })
                 .catch(error => {
                     console.error('Error fetching content:', error);
                 });
         });
-    });    
+    });
+
+    document.querySelectorAll('#dynamic-form input').forEach(input => {
+        input.addEventListener('input', () => {
+            const fieldHolder = input.parentElement;
+            if (input.value) {
+                fieldHolder.classList.add('active');
+            } else {
+                fieldHolder.classList.remove('active');
+            }
+        });
+    });
+
+    const updateQrCode = () => {
+        const formData = {};
+        const typeId = document.querySelector('.nav-link.active')?.getAttribute('data-id') || null;
+
+        // Collect form data
+        document.querySelectorAll('#dynamic-form input').forEach(field => {
+            formData[field.name] = field.value;
+        });
+
+        // Collect styling data
+        const styleData = {
+            format: document.querySelector('input[name="btnradio"]:checked').value,
+            fill: document.getElementById('pixelColor').value,
+            background: document.getElementById('backgroundColor').value,
+            box_size: document.getElementById('pixelSize').value,
+            border: document.getElementById('borderSize').value,
+        };
+
+        const queryParams = new URLSearchParams({
+            ...formData,
+            ...styleData,
+            typeId: typeId,
+        }).toString();
+
+        const qrCodeUrl = `http://127.0.0.1:5001/qrcode?${queryParams}`;
+        console.log(qrCodeUrl);
+        const qrCodeImage = document.querySelector('.col-3 img');
+        qrCodeImage.src = qrCodeUrl; // Update the QR code image dynamically
+    };
+
+    const attachFormListeners = (typeId) => {
+        const form = document.getElementById('dynamic-form');
+        if (!form) return;
+
+        form.querySelectorAll('input').forEach(field => {
+            field.addEventListener('input', updateQrCode);
+        });
+    };
+
+    document.querySelectorAll('#pixelColor, #backgroundColor, #pixelSize, #borderSize, #btnradio1, #btnradio2').forEach(control => {
+        control.addEventListener('input', updateQrCode);
+    });
+
+    updateQrCode();
 });
 
 
