@@ -18,6 +18,6 @@ class QrCodeType extends Model
 
     public function formFields()
     {
-        return $this->hasMany(FormField::class);
+        return $this->hasMany(FormField::class)->orderBy('id');
     }
 }

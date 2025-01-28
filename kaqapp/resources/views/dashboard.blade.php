@@ -44,8 +44,8 @@
                         </div>
 
                         <!-- Standard Buttons -->
-                        <button class="btn btn-dark mb-0">Download</button>
-                        <button class="btn btn-dark mb-0">Copy</button>
+                        <button class="btn btn-dark mb-0 download-button">Download</button>
+                        <button class="btn btn-dark mb-0 copy-button">Copy</button>
                     </div>
                 </div>
 
@@ -77,124 +77,208 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-    // Attach click event to sidebar links
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', event => {
-            event.preventDefault(); // Prevent default link behavior
+        let qrCodeBaseUrl = '/qrcode';
 
-            const typeId = link.getAttribute('data-id'); // Get type ID
+        // Attach click event to sidebar links
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', event => {
+                event.preventDefault(); // Prevent default link behavior
 
-            // Fetch content from API
-            fetch(`/api/types/${typeId}`)
-                .then(response => response.json())
-                .then(data => {
-                    // Populate main content
-                    const mainContent = document.getElementById('main-content');
-                    mainContent.innerHTML = `
-                        <h2>${data.name}</h2>
-                        <div class="trim" id="text">
-                            ${data.description}
-                        </div>
-                        <button id="toggle-button" class="btn btn-link p-0">more</button> 
-                        <h3 style="margin-bottom: 30px">DATA</h3>
-                        <form id="dynamic-form">
-                            ${data.form_fields.map(field => `
-                                <div class="field-holder">
-                                    <input 
-                                        type="${field.type}" 
-                                        class="form-control" 
-                                        id="${field.label.toLowerCase().replace(/\s+/g, '_')}" 
-                                        name="${field.label.toLowerCase().replace(/\s+/g, '_')}" 
-                                        ${field.required ? 'required' : ''}
-                                    >
-                                    <label for="${field.label.toLowerCase().replace(/\s+/g, '_')}" class="form-label">
-                                        ${field.label}
-                                    </label>
-                                </div>
-                            `).join('')}
-                        </form>
-                    `;
+                const typeId = link.getAttribute('data-id'); // Get type ID
 
-                    // Attach the toggle button listener after content is updated
-                    const text = document.getElementById("text");
-                    const toggleButton = document.getElementById("toggle-button");
-
-                    toggleButton.addEventListener("click", () => {
-                        if (text.classList.contains("trim")) {
-                            text.classList.remove("trim");
-                            toggleButton.textContent = "less";
-                        } else {
-                            text.classList.add("trim");
-                            toggleButton.textContent = "more";
+                // Fetch content from API
+                fetch(`/api/types/${typeId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Populate main content
+                        const mainContent = document.getElementById('main-content');
+                        if (!mainContent) {
+                            console.error("Main content container not found.");
+                            return;
                         }
+
+                        mainContent.innerHTML = `
+                            <h2>${data.name}</h2>
+                            <div class="trim" id="text">
+                                ${data.description}
+                            </div>
+                            <button id="toggle-button" class="btn btn-link p-0">more</button> 
+                            <h3 style="margin-bottom: 30px">DATA</h3>
+                            <form id="dynamic-form">
+                                ${data.form_fields.map(field => `
+                                    <div class="field-holder">
+                                        <input 
+                                            type="${field.type}" 
+                                            class="form-control" 
+                                            id="${field.label.toLowerCase().replace(/\s+/g, '_')}" 
+                                            name="${field.label.toLowerCase().replace(/\s+/g, '_')}" 
+                                            ${field.required ? 'required' : ''}
+                                            value="${field.value || ''}"
+                                        >
+                                        <label for="${field.label.toLowerCase().replace(/\s+/g, '_')}" class="form-label">
+                                            ${field.label}
+                                        </label>
+                                    </div>
+                                `).join('')}
+                            </form>
+                        `;
+
+                        qrCodeBaseUrl = data.url;
+
+                        // Attach the toggle button listener after content is updated
+                        const text = document.getElementById("text");
+                        const toggleButton = document.getElementById("toggle-button");
+
+                        if (toggleButton && text) {
+                            toggleButton.addEventListener("click", () => {
+                                if (text.classList.contains("trim")) {
+                                    text.classList.remove("trim");
+                                    toggleButton.textContent = "less";
+                                } else {
+                                    text.classList.add("trim");
+                                    toggleButton.textContent = "more";
+                                }
+                            });
+                        }
+
+                        // Attach listeners to form fields for changes
+                        attachFormListeners(typeId);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching content:', error);
                     });
-
-                    // Attach listeners to form fields for changes
-                    attachFormListeners(typeId);
-                })
-                .catch(error => {
-                    console.error('Error fetching content:', error);
-                });
+            });
         });
-    });
 
-    document.querySelectorAll('#dynamic-form input').forEach(input => {
-        input.addEventListener('input', () => {
-            const fieldHolder = input.parentElement;
-            if (input.value) {
-                fieldHolder.classList.add('active');
+        const attachFormListeners = () => {
+            const form = document.getElementById('dynamic-form');
+            if (!form) return;
+
+            form.querySelectorAll('input, textarea').forEach(field => {
+                // Apply 'has-value' class for prefilled inputs
+                if (field.value.trim() !== "") {
+                    field.classList.add('has-value');
+                }
+
+                // Add event listener to update class dynamically
+                field.addEventListener('input', () => {
+                    if (field.value.trim() !== "") {
+                        field.classList.add('has-value');
+                    } else {
+                        field.classList.remove('has-value');
+                    }
+                });
+
+                if (field.name === 'phone') {
+                    field.addEventListener('input', () => {
+                        field.value = field.value.replace(/\s+/g, ''); // Remove all whitespace
+                    });
+                }
+            });
+
+            // Attach event listener to form fields for dynamic QR code update
+            form.addEventListener('input', updateQrCode);
+        };
+
+
+        // Update QR code dynamically
+        const updateQrCode = () => {
+            const formData = {};
+            const typeId = document.querySelector('.nav-link.active')?.getAttribute('data-id') || null;
+
+            // Collect form data
+            document.querySelectorAll('#dynamic-form input').forEach(field => {
+                formData[field.name] = field.value;
+            });
+
+            // Collect styling data
+            const styleData = {
+                format: document.querySelector('input[name="btnradio"]:checked')?.value || 'png',
+                fill: document.getElementById('pixelColor')?.value || '#000000',
+                background: document.getElementById('backgroundColor')?.value || '#ffffff',
+                box_size: document.getElementById('pixelSize')?.value || 10,
+                border: document.getElementById('borderSize')?.value || 4,
+            };
+
+            const queryParams = new URLSearchParams({
+                ...formData,
+                ...styleData,
+                typeId: typeId,
+            }).toString();
+
+            const qrCodeUrl = `http://127.0.0.1:5001${qrCodeBaseUrl}?${queryParams}`;
+            console.log(qrCodeUrl);
+            const qrCodeImage = document.querySelector('.col-3 img');
+            if (qrCodeImage) {
+                qrCodeImage.src = qrCodeUrl;
+            }
+        };
+
+        // Attach event listeners to static controls
+        document.querySelectorAll('#pixelColor, #backgroundColor, #pixelSize, #borderSize, #btnradio1, #btnradio2').forEach(control => {
+            control.addEventListener('input', updateQrCode);
+        });
+
+        // Initial QR code update
+        updateQrCode();
+
+        const downloadButton = document.querySelector('.download-button');
+        const copyButton = document.querySelector('.copy-button');
+        const qrCodeImage = document.querySelector('.col-3 img');
+
+        downloadButton.addEventListener('click', () => {
+            if (qrCodeImage && qrCodeImage.src) {
+                fetch(qrCodeImage.src)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.blob();
+                    })
+                    .then(blob => {
+                        const url = URL.createObjectURL(blob); // Create a temporary URL for the blob
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = 'qrcode.png'; // Set the default filename
+                        document.body.appendChild(link); // Append link to the DOM
+                        link.click(); // Trigger the download
+                        link.remove(); // Clean up
+                        URL.revokeObjectURL(url); // Revoke the object URL to free memory
+                    })
+                    .catch(error => {
+                        console.error('Failed to download the image:', error);
+                        alert('Failed to download the QR code image.');
+                    });
             } else {
-                fieldHolder.classList.remove('active');
+                alert('QR code not available.');
+            }
+        });
+
+        // Copy Button Functionality
+        copyButton.addEventListener('click', () => {
+            if (qrCodeImage && qrCodeImage.src) {
+                fetch(qrCodeImage.src)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const item = new ClipboardItem({ 'image/png': blob });
+                        navigator.clipboard.write([item])
+                            .then(() => {
+                                alert('QR code image copied to clipboard!');
+                            })
+                            .catch(err => {
+                                console.error('Failed to copy image:', err);
+                                alert('Failed to copy the QR code image.');
+                            });
+                    })
+                    .catch(err => {
+                        console.error('Failed to fetch image for copying:', err);
+                        alert('Failed to fetch QR code image.');
+                    });
+            } else {
+                alert('QR code not generated yet.');
             }
         });
     });
-
-    const updateQrCode = () => {
-        const formData = {};
-        const typeId = document.querySelector('.nav-link.active')?.getAttribute('data-id') || null;
-
-        // Collect form data
-        document.querySelectorAll('#dynamic-form input').forEach(field => {
-            formData[field.name] = field.value;
-        });
-
-        // Collect styling data
-        const styleData = {
-            format: document.querySelector('input[name="btnradio"]:checked').value,
-            fill: document.getElementById('pixelColor').value,
-            background: document.getElementById('backgroundColor').value,
-            box_size: document.getElementById('pixelSize').value,
-            border: document.getElementById('borderSize').value,
-        };
-
-        const queryParams = new URLSearchParams({
-            ...formData,
-            ...styleData,
-            typeId: typeId,
-        }).toString();
-
-        const qrCodeUrl = `http://127.0.0.1:5001/qrcode?${queryParams}`;
-        console.log(qrCodeUrl);
-        const qrCodeImage = document.querySelector('.col-3 img');
-        qrCodeImage.src = qrCodeUrl; // Update the QR code image dynamically
-    };
-
-    const attachFormListeners = (typeId) => {
-        const form = document.getElementById('dynamic-form');
-        if (!form) return;
-
-        form.querySelectorAll('input').forEach(field => {
-            field.addEventListener('input', updateQrCode);
-        });
-    };
-
-    document.querySelectorAll('#pixelColor, #backgroundColor, #pixelSize, #borderSize, #btnradio1, #btnradio2').forEach(control => {
-        control.addEventListener('input', updateQrCode);
-    });
-
-    updateQrCode();
-});
-
-
 </script>
+
 @endsection

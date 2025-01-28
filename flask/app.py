@@ -7,23 +7,29 @@ import zlib
 import lzma
 import struct
 import requests
+from flask_cors import CORS
+from datetime import datetime, timezone
+
 
 
 app = Flask(__name__)
-
+CORS(app)
 CLIENT_ID = "1025295778547-069622a895e1nd1srnknp1p8gv9h2c00.apps.googleusercontent.com"
 CLIENT_SECRET = "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"
 REDIRECT_URI = "https://kaqapp.com/oauth2callback"
+
+
+
 
 @app.route('/qrcode', methods=['GET'])
 def generate_qr():
     # Extract and validate parameters
     try:
-        data = request.args.get('data', 'https://www.google.sk')
+        data = request.args.get('url', 'https://www.google.sk')
         format = request.args.get('format', 'png')
         fill_color = request.args.get('fill', 'black')
         back_color = request.args.get('background', 'white')
-        
+
         version = int(request.args.get('version', 2))
         if not (1 <= version <= 40):
             return {"error": "Version must be an integer between 1 and 40."}, 400
@@ -106,6 +112,47 @@ def generate_qr():
     except Exception as e:
         return {"error": f"An unexpected error occurred: {e}"}, 500
 
+@app.route('/wifi', methods=['GET', 'POST'])
+def generate_wifi_qr():
+    try:
+        # Handle GET and POST requests
+        if request.method == 'POST':
+            request_data = request.get_json()
+        elif request.method == 'GET':
+            request_data = request.args
+
+        # Extract Wi-Fi connection details
+        ssid = request_data.get('ssid', None)  # Wi-Fi network name
+        password = request_data.get('password', '')  # Wi-Fi password
+        encryption = request_data.get('encryption', 'WPA')  # Encryption type (default to WPA)
+        hidden = request_data.get('hidden', 'false').lower() == 'true'  # Hidden network flag
+
+        if not ssid:
+            return {"error": "Wi-Fi SSID is required."}, 400
+
+        # Build the Wi-Fi QR code content
+        hidden_flag = f"H:{hidden};" if hidden else ""
+        wifi_data = f"WIFI:T:{encryption};S:{ssid};P:{password};{hidden_flag}"
+
+        # Extract QR code styling options
+        format = request_data.get('format', 'svg')  # Default QR code format
+        fill_color = request_data.get('fill', 'black')  # Default fill color
+        back_color = request_data.get('background', 'white')  # Default background color
+        box_size = int(request_data.get('box_size', 10))  # Default box size
+        border = int(request_data.get('border', 4))  # Default border size
+
+        # Generate and style the QR code with the Wi-Fi data
+        return styling(wifi_data, format, fill_color, back_color, box_size, border)
+
+    except ValueError as ve:
+        return {"error": f"Invalid parameter value: {ve}"}, 400
+    except Exception as e:
+        return {"error": f"An unexpected error occurred: {e}"}, 500
+
+
+
+
+
 
 @app.route('/vcard', methods=['GET', 'POST'])
 def generate_vcard_with_photo():
@@ -117,23 +164,26 @@ def generate_vcard_with_photo():
             request_data = request.args
 
         # Extract vCard data
-        name = request_data.get('name', 'John Doe')
-        phone = request_data.get('phone', '123456789')
-        email = request_data.get('email', 'example@example.com')
+        name = request_data.get('name', 'Unknown')
+        phone = request_data.get('phone', '')
+        email = request_data.get('email', '')
         company = request_data.get('company', '')
         title = request_data.get('title', '')
         website = request_data.get('website', '')
         address = request_data.get('address', '')
         photo_url = request_data.get('photo', '')
 
+        # Validate required fields
+        if not name or not phone:
+            return {"error": "Name and phone are required fields for vCard."}, 400
+
         # Generate vCard data
         vcard_data = f"""BEGIN:VCARD
-        VERSION:3.0
-        FN:{name}
+        VERSION:4.0
+        FN:{name}   
         TEL:{phone}
         EMAIL:{email}
         """
-
         if company:
             vcard_data += f"ORG:{company}\n"
         if title:
@@ -141,30 +191,19 @@ def generate_vcard_with_photo():
         if website:
             vcard_data += f"URL:{website}\n"
         if address:
-            vcard_data += f"ADR:{address}\n"
-
-        # Include profile photo if provided
-        if photo_url:
-            try:
-                import base64
-                import requests
-
-                # Fetch photo and encode in Base64
-                response = requests.get(photo_url)
-                response.raise_for_status()
-                photo_base64 = base64.b64encode(response.content).decode()
-                vcard_data += f"PHOTO;ENCODING=b;TYPE=JPEG:{photo_base64}\n"
-            except Exception as e:
-                return {"error": f"Failed to include photo: {e}"}, 400
+            vcard_data += f"ADR:;;{address}\n"
 
         vcard_data += "END:VCARD"
 
+        # Clean up any unnecessary spaces or indentation
+        vcard_data = vcard_data.strip()
+
         # Extract QR code styling options
-        format = request_data.get('format', 'svg')
-        fill_color = request_data.get('fill', 'black')
-        back_color = request_data.get('background', 'white')
-        box_size = int(request_data.get('box_size', 10))
-        border = int(request_data.get('border', 4))
+        format = request_data.get('format', 'svg')  # Default QR code format
+        fill_color = request_data.get('fill', 'black')  # Default fill color
+        back_color = request_data.get('background', 'white')  # Default background color
+        box_size = int(request_data.get('box_size', 10))  # Default box size
+        border = int(request_data.get('border', 4))  # Default border size
 
         # Generate QR code with vCard data and styling
         return styling(vcard_data, format, fill_color, back_color, box_size, border)
@@ -694,8 +733,6 @@ def generate_paypal_payment_qr():
 
 
 
-
-
 @app.route('/event', methods=['GET', 'POST'])
 def generate_calendar_event_qr():
     try:
@@ -707,10 +744,49 @@ def generate_calendar_event_qr():
 
         # Extract event details
         title = request_data.get('title', 'New Event')  # Event title
-        start = request_data.get('start', '20240101T090000')  # Start date/time (YYYYMMDDTHHMMSS)
-        end = request_data.get('end', '20240101T100000')  # End date/time (YYYYMMDDTHHMMSS)
+        start_input = request_data.get('start')  # Start date/time (from datetime-local input)
+        end_input = request_data.get('end')  # End date/time (from datetime-local input)
         location = request_data.get('location', '')  # Event location
         description = request_data.get('description', '')  # Event description
+
+        # Validate datetime inputs
+        if not start_input or not end_input:
+            return {"error": "Start and end datetime values are required."}, 400
+
+        # Format datetime inputs into iCalendar format
+        def format_datetime_to_ics(dt_input):
+            try:
+                # Parse the input datetime (assumes datetime-local format)
+                dt_obj = datetime.strptime(dt_input, '%Y-%m-%dT%H:%M')  # Convert to datetime object
+                # Convert to UTC and format as iCalendar (YYYYMMDDTHHMMSSZ)
+                return dt_obj.astimezone(timezone.utc).strftime('%Y%m%dT%H%M%SZ')
+            except ValueError as e:
+                raise ValueError(f"Invalid datetime format: {e}")
+
+        start = format_datetime_to_ics(start_input)
+        end = format_datetime_to_ics(end_input)
+
+        # Escape fields to ensure proper iCalendar formatting
+        def escape_ics_field(value):
+            return value.replace('\\', '\\\\').replace(';', '\\;').replace(',', '\\,').replace(':', '\\:')
+
+        title = escape_ics_field(title)
+        location = escape_ics_field(location)
+        description = escape_ics_field(description)
+
+        # Generate the iCalendar data
+        qr_data = (
+            f"BEGIN:VCALENDAR\n"
+            f"VERSION:2.0\n"
+            f"BEGIN:VEVENT\n"
+            f"SUMMARY:{title}\n"
+            f"DTSTART:{start}\n"
+            f"DTEND:{end}\n"
+            f"LOCATION:{location}\n"
+            f"DESCRIPTION:{description}\n"
+            f"END:VEVENT\n"
+            f"END:VCALENDAR"
+        )
 
         # Extract QR code styling options
         format = request_data.get('format', 'svg')  # Default QR code format
@@ -719,18 +795,7 @@ def generate_calendar_event_qr():
         box_size = int(request_data.get('box_size', 10))  # Default box size
         border = int(request_data.get('border', 4))  # Default border size
 
-        # Generate the Google Calendar event QR code content
-        qr_data = (
-            f"BEGIN:VEVENT\n"
-            f"SUMMARY:{title}\n"
-            f"DTSTART:{start}\n"
-            f"DTEND:{end}\n"
-            f"LOCATION:{location}\n"
-            f"DESCRIPTION:{description}\n"
-            f"END:VEVENT"
-        )
-
-        # Generate and style the QR code
+        # Generate QR code with the event data
         return styling(qr_data, format, fill_color, back_color, box_size, border)
 
     except ValueError as ve:
@@ -989,8 +1054,10 @@ def generate_google_maps_route_qr():
             request_data = request.args
 
         # Extract route details
-        start_location = request_data.get('start', None)  # Starting location
-        destination = request_data.get('destination', None)  # Destination
+            
+        start_location = request_data.get('start', '').strip() or 'London'  # Default to 'London'
+        destination = request_data.get('destination', '').strip() or 'Paris'  # Default to 'Paris'
+
         stops = request_data.get('stops', '').split(',')  # Stops as comma-separated list
 
         if not start_location or not destination:
@@ -1066,8 +1133,8 @@ def generate_apple_maps_route_qr():
             request_data = request.args
 
         # Extract route details
-        start_location = request_data.get('start', None)  # Starting location
-        destination = request_data.get('destination', None)  # Destination
+        start_location = request_data.get('start', '').strip() or 'London'  # Default to 'London'
+        destination = request_data.get('destination', '').strip() or 'Paris'  # Default to 'Paris'
         stops = request_data.get('stops', '').split(',')  # Stops as comma-separated list
 
         if not start_location or not destination:
@@ -1100,48 +1167,10 @@ def generate_apple_maps_route_qr():
 
 
 
-@app.route('/wifi', methods=['GET', 'POST'])
-def generate_wifi_qr():
-    try:
-        # Handle GET and POST requests
-        if request.method == 'POST':
-            request_data = request.get_json()
-        elif request.method == 'GET':
-            request_data = request.args
-
-        # Extract Wi-Fi connection details
-        ssid = request_data.get('ssid', None)  # Wi-Fi network name
-        password = request_data.get('password', '')  # Wi-Fi password
-        encryption = request_data.get('encryption', 'WPA')  # Encryption type (default to WPA)
-        hidden = request_data.get('hidden', 'false').lower() == 'true'  # Hidden network flag
-
-        if not ssid:
-            return {"error": "Wi-Fi SSID is required."}, 400
-
-        # Build the Wi-Fi QR code content
-        hidden_flag = f"H:{hidden};" if hidden else ""
-        wifi_data = f"WIFI:T:{encryption};S:{ssid};P:{password};{hidden_flag}"
-
-        # Extract QR code styling options
-        format = request_data.get('format', 'svg')  # Default QR code format
-        fill_color = request_data.get('fill', 'black')  # Default fill color
-        back_color = request_data.get('background', 'white')  # Default background color
-        box_size = int(request_data.get('box_size', 10))  # Default box size
-        border = int(request_data.get('border', 4))  # Default border size
-
-        # Generate and style the QR code with the Wi-Fi data
-        return styling(wifi_data, format, fill_color, back_color, box_size, border)
-
-    except ValueError as ve:
-        return {"error": f"Invalid parameter value: {ve}"}, 400
-    except Exception as e:
-        return {"error": f"An unexpected error occurred: {e}"}, 500
-
-
 def styling(encoded_data, format='svg', fill_color='black', back_color='white', box_size=10, border=4):
     request.args = request.args.copy()
     request.args.update({
-        'data': encoded_data,
+        'url': encoded_data,
         'format': format,
         'fill': fill_color,
         'background': back_color,

@@ -25,6 +25,7 @@ Route::get('/api/types/{id}', function ($id) {
     return response()->json([
         'name' => $type->name,
         'description' => $type->description,
+        'url' => $type->url,
         'form_fields' => $type->formFields->map(function ($field) {
             return [
                 'label' => $field->label,
