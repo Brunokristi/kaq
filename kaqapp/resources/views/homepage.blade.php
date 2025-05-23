@@ -5,18 +5,18 @@
 @section('content')
 <div class="homepage">
     <!-- Header Section -->
-    <div class="row text-center pt-4 m-4 mb-5">
+    <div class="row text-center pt-4 mb-5">
         <h1>{{ __('homepage.slogan') }}</h1>
         <h2>
             {{ __('homepage.subtitle') }}
             <span class="highlight">{{ __('homepage.no_signups') }}</span>, 
             <span class="highlight">{{ __('homepage.no_subscriptions') }}</span>, 
-            {{ __('homepage.always_free') }}. {{ __('homepage.just_click') }}
+            {{ __('homepage.always_free') }}.
         </h2>
     </div>
 
     <!-- QR Code Purpose Section -->
-    <div class="row m-4 mt-5 mb-5 custom-margin">
+    <div class="row mt-5 mb-5 custom-margin">
         <h2 class="text-center mb-4">{{ __('homepage.qr_code_purpose') }}</h2>
         <div class="container text-center mb-4">
             <div class="row align-items-start">
@@ -47,22 +47,24 @@
     </div>
 
     <!-- API Docs Section -->
-    <div class="row m-4 text-center mb-5 custom-margin">
-        <h2 class="text-center mb-4">{{ __('homepage.api_docs_title') }}</h2>
-        <div class="container text-center mb-4">
-            <div class="row align-items-start">
-                <div class="col-sm-4"></div>
-                <div class="col-sm-4">
-                    <a href="#" class="solid">{{ __('homepage.api_docs') }}</a>
+    <div class="row text-center mb-5 custom-margin " style="padding: 12px;">
+        <div class="container text-center mb-4 api-section-bg" style="padding: 20px 0; background: url('{{ asset('assets/image1.jpg') }}') no-repeat center center; background-size: cover;">
+            <h2 class="text-center mb-4">{{ __('homepage.api_docs_title') }}</h2>
+            <div class="container text-center mb-4"  style="padding: 12px;">
+                <div class="row align-items-start">
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-4">
+                        <a href="#" class="solid">{{ __('homepage.api_docs') }}</a>
+                    </div>
+                    <div class="col-sm-4"></div>
                 </div>
-                <div class="col-sm-4"></div>
             </div>
+            <a href="#">{{ __('homepage.get_started') }}<i class="bi bi-arrow-right"></i></a>
         </div>
-        <a href="#">{{ __('homepage.get_started') }}<i class="bi bi-arrow-right"></i></a>
     </div>
 
     <!-- FAQ Section -->
-    <div class="row m-4 text-center mb-5">
+    <div class="row text-center mb-5" style="padding: 12px;">
         <h2>{{ __('homepage.faq_title') }}</h2>
         <div class="accordion" id="firstAccordion">
             <div class="accordion-item">
@@ -105,18 +107,18 @@
     </div>
 
     <!-- Contact Section -->
-    <div class="row text-center m-4">
+    <div class="row text-center p-4">
         <p>{{ __('homepage.not_found') }}</p>
         <a href="#">{{ __('homepage.contact') }}<i class="bi bi-arrow-right"></i></a>
     </div>
 
     <!-- Stories Section -->
-    <div class="row m-4 mt-5 mb-5 text-center">
+    <div class="row mt-5 mb-5 text-center">
         <h2>{{ __('homepage.stories_title') }}</h2>
-        <div class="container text-center mb-4">
+        <div class="container text-center mb-4 p-4 ">
             <div class="row align-items-start justify-content-between">
                 <!-- Card 1 -->
-                <div class="card mx-3" style="width: 20rem;">
+                <div class="card m-0 col-12 col-lg">
                     <img src="{{ asset('assets/stories-cook.jpg') }}" class="card-img-top" alt="{{ __('homepage.story_chef_alt') }}">
                     <div class="card-body">
                         <p class="card-text">{{ __('homepage.story_chef') }}</p>
@@ -124,7 +126,7 @@
                     </div>
                 </div>
                 <!-- Card 2 -->
-                <div class="card mx-3" style="width: 20rem;">
+                <div class="card m-0 col-12 col-lg">
                     <img src="{{ asset('assets/stories-yoga.jpg') }}" class="card-img-top" alt="{{ __('homepage.story_yoga_alt') }}">
                     <div class="card-body">
                         <p class="card-text">{{ __('homepage.story_yoga') }}</p>
@@ -132,7 +134,7 @@
                     </div>
                 </div>
                 <!-- Card 3 -->
-                <div class="card mx-3" style="width: 20rem;">
+                <div class="card m-0 col-12 col-lg">
                     <img src="{{ asset('assets/stories-flower.jpg') }}" class="card-img-top" alt="{{ __('homepage.story_flower_alt') }}">
                     <div class="card-body">
                         <p class="card-text">{{ __('homepage.story_flower') }}</p>
