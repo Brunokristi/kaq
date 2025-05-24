@@ -159,9 +159,8 @@
         margin-bottom: 7rem !important;
     }
 
-    .api-section-bg {
+    .api-section {
         color: #fff !important;
-        border: solid 1px #000;
     }
 }
 
@@ -182,6 +181,7 @@
 
     h2 {
         margin-bottom: 4rem;
+        font-size: 16px;
     }
 
     .field-holder {
@@ -245,7 +245,7 @@
 
     .btn {
         display: block;
-        font-size: 1rem;
+        font-size: 14px;
         color: #fff;
         background-color: #000;
         border: none;

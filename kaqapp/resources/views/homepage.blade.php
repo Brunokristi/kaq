@@ -5,7 +5,7 @@
 @section('content')
 <div class="homepage">
     <!-- Header Section -->
-    <div class="row text-center pt-4 mb-5">
+    <div class="row text-center pt-4 mt-5 mb-5 custom-margin">
         <h1>{{ __('homepage.slogan') }}</h1>
         <h2>
             {{ __('homepage.subtitle') }}
@@ -48,8 +48,8 @@
 
     <!-- API Docs Section -->
     <div class="row text-center mb-5 custom-margin " style="padding: 12px;">
-        <div class="container text-center mb-4 api-section-bg" style="padding: 20px 0; background: url('{{ asset('assets/image1.jpg') }}') no-repeat center center; background-size: cover;">
-            <h2 class="text-center mb-4">{{ __('homepage.api_docs_title') }}</h2>
+        <div class="container text-center mb-4 api-section" style="padding: 20px 0; background: url('{{ asset('assets/image0.jpg') }}') no-repeat center center; background-size: cover; border: 1px solid #000;">
+            <h2 class="text-center mb-4 api-section">{{ __('homepage.api_docs_title') }}</h2>
             <div class="container text-center mb-4"  style="padding: 12px;">
                 <div class="row align-items-start">
                     <div class="col-sm-4"></div>
@@ -59,7 +59,7 @@
                     <div class="col-sm-4"></div>
                 </div>
             </div>
-            <a href="#">{{ __('homepage.get_started') }}<i class="bi bi-arrow-right"></i></a>
+            <a class="api-section" href="#">{{ __('homepage.get_started') }}<i class="bi bi-arrow-right api-section"></i></a>
         </div>
     </div>
 
@@ -114,27 +114,32 @@
 
     <!-- Stories Section -->
     <div class="row mt-5 mb-5 text-center">
-        <h2>{{ __('homepage.stories_title') }}</h2>
-        <div class="container text-center mb-4 p-4 ">
-            <div class="row align-items-start justify-content-between">
-                <!-- Card 1 -->
-                <div class="card m-0 col-12 col-lg">
+    <h2>{{ __('homepage.stories_title') }}</h2>
+    <div class="container text-center mb-4 p-4">
+        <div class="row align-items-start justify-content-between g-3">
+            <!-- Card 1 -->
+            <div class="col-12 col-lg">
+                <div class="card h-100">
                     <img src="{{ asset('assets/stories-cook.jpg') }}" class="card-img-top" alt="{{ __('homepage.story_chef_alt') }}">
                     <div class="card-body">
                         <p class="card-text">{{ __('homepage.story_chef') }}</p>
                         <a href="#"><i class="bi bi-arrow-right"></i></a>
                     </div>
                 </div>
-                <!-- Card 2 -->
-                <div class="card m-0 col-12 col-lg">
+            </div>
+            <!-- Card 2 -->
+            <div class="col-12 col-lg">
+                <div class="card h-100">
                     <img src="{{ asset('assets/stories-yoga.jpg') }}" class="card-img-top" alt="{{ __('homepage.story_yoga_alt') }}">
                     <div class="card-body">
                         <p class="card-text">{{ __('homepage.story_yoga') }}</p>
                         <a href="#"><i class="bi bi-arrow-right"></i></a>
                     </div>
                 </div>
-                <!-- Card 3 -->
-                <div class="card m-0 col-12 col-lg">
+            </div>
+            <!-- Card 3 -->
+            <div class="col-12 col-lg">
+                <div class="card h-100">
                     <img src="{{ asset('assets/stories-flower.jpg') }}" class="card-img-top" alt="{{ __('homepage.story_flower_alt') }}">
                     <div class="card-body">
                         <p class="card-text">{{ __('homepage.story_flower') }}</p>
@@ -144,5 +149,7 @@
             </div>
         </div>
     </div>
+</div>
+
 </div>
 @endsection

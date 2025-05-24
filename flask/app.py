@@ -1,4 +1,4 @@
-from flask import Flask, request, send_file
+from flask import Flask, request, send_file, jsonify, Response
 import qrcode
 import qrcode.image.svg
 import io
@@ -8,7 +8,17 @@ import lzma
 import struct
 import requests
 from flask_cors import CORS
-from datetime import datetime, timezone
+from datetime import datetime, timezone 
+import base64
+import textwrap
+from urllib.parse import unquote
+
+
+
+
+placeholder_photo_base64 = textwrap.dedent("""\
+    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
+""").replace("\n", "")
 
 
 
@@ -25,7 +35,7 @@ REDIRECT_URI = "https://kaqapp.com/oauth2callback"
 def generate_qr():
     # Extract and validate parameters
     try:
-        data = request.args.get('url', 'https://www.google.sk')
+        data = unquote(request.args.get('url', 'https://www.google.sk'))
         format = request.args.get('format', 'png')
         fill_color = request.args.get('fill', 'black')
         back_color = request.args.get('background', 'white')
@@ -153,66 +163,69 @@ def generate_wifi_qr():
 
 
 
-
 @app.route('/vcard', methods=['GET', 'POST'])
 def generate_vcard_with_photo():
     try:
-        # Handle GET and POST requests
-        if request.method == 'POST':
-            request_data = request.get_json()
-        elif request.method == 'GET':
-            request_data = request.args
+        request_data = request.get_json() if request.method == 'POST' else request.args
 
-        # Extract vCard data
-        name = request_data.get('name', 'Unknown')
-        phone = request_data.get('phone', '')
-        email = request_data.get('email', '')
-        company = request_data.get('company', '')
-        title = request_data.get('title', '')
-        website = request_data.get('website', '')
-        address = request_data.get('address', '')
-        photo_url = request_data.get('photo', '')
+        # Basic contact details
+        name = request_data.get('name', '').strip()
+        phone = request_data.get('phone', '').strip()
+        email = request_data.get('email', '').strip()
+        company = request_data.get('company', '').strip()
+        title = request_data.get('title', '').strip()
+        website = request_data.get('website', '').strip()
+        address = request_data.get('address', '').strip()
 
         # Validate required fields
         if not name or not phone:
             return {"error": "Name and phone are required fields for vCard."}, 400
 
-        # Generate vCard data
-        vcard_data = f"""BEGIN:VCARD
-        VERSION:4.0
-        FN:{name}   
-        TEL:{phone}
-        EMAIL:{email}
-        """
+        # Structured name
+        name_parts = name.split(" ", 1)
+        first_name = name_parts[0]
+        last_name = name_parts[1] if len(name_parts) > 1 else ""
+
+        # Build vCard lines
+        vcard_lines = [
+            "BEGIN:VCARD",
+            "VERSION:4.0",
+            f"N:{last_name};{first_name};;;",
+            f"FN:{name}",
+            f"TEL:{phone}",
+        ]
+
+        if email:
+            vcard_lines.append(f"EMAIL:{email}")
         if company:
-            vcard_data += f"ORG:{company}\n"
+            vcard_lines.append(f"ORG:{company}")
         if title:
-            vcard_data += f"TITLE:{title}\n"
+            vcard_lines.append(f"TITLE:{title}")
         if website:
-            vcard_data += f"URL:{website}\n"
+            vcard_lines.append(f"URL:{website}")
         if address:
-            vcard_data += f"ADR:;;{address}\n"
+            vcard_lines.append(f"ADR:;;{address}")
 
-        vcard_data += "END:VCARD"
+        # # Always use the placeholder Base64 image
+        # vcard_lines.append(f"PHOTO;ENCODING=b;MEDIATYPE=image/jpeg:{placeholder_photo_base64}")
 
-        # Clean up any unnecessary spaces or indentation
-        vcard_data = vcard_data.strip()
+        vcard_lines.append("END:VCARD")
+        vcard_data = "\n".join(vcard_lines)
 
-        # Extract QR code styling options
-        format = request_data.get('format', 'svg')  # Default QR code format
-        fill_color = request_data.get('fill', 'black')  # Default fill color
-        back_color = request_data.get('background', 'white')  # Default background color
-        box_size = int(request_data.get('box_size', 10))  # Default box size
-        border = int(request_data.get('border', 4))  # Default border size
+        # QR styling params
+        format = request_data.get('format', 'svg')
+        fill_color = request_data.get('fill', 'black')
+        back_color = request_data.get('background', 'white')
+        box_size = int(request_data.get('box_size', 10))
+        border = int(request_data.get('border', 4))
 
-        # Generate QR code with vCard data and styling
+        # Send vCard string to styling()
         return styling(vcard_data, format, fill_color, back_color, box_size, border)
 
     except ValueError as ve:
         return {"error": f"Invalid parameter value: {ve}"}, 400
     except Exception as e:
         return {"error": f"An unexpected error occurred: {e}"}, 500
-
 
 @app.route('/email', methods=['GET', 'POST'])
 def generate_email_qr():
