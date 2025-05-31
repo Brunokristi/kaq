@@ -9,9 +9,15 @@ import struct
 import requests
 from flask_cors import CORS
 from datetime import datetime, timezone 
-import base64
 import textwrap
 from urllib.parse import unquote
+import quopri
+import io
+import traceback
+import xml.etree.ElementTree as ET
+from urllib.parse import quote
+import re
+
 
 
 
@@ -22,90 +28,83 @@ placeholder_photo_base64 = textwrap.dedent("""\
 
 
 
+
 app = Flask(__name__)
 CORS(app)
 CLIENT_ID = "1025295778547-069622a895e1nd1srnknp1p8gv9h2c00.apps.googleusercontent.com"
 CLIENT_SECRET = "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"
 REDIRECT_URI = "https://kaqapp.com/oauth2callback"
 
+def qp_utf8(value: str) -> str:
+    return quopri.encodestring(value.encode('utf-8')).decode('utf-8')
+
+
+def normalize_phone(phone: str) -> str:
+    digits = re.sub(r'\D', '', phone)
+
+    if digits.startswith('0'):
+        return '421' + digits[1:]
+    
+    if digits.startswith('004'):
+        return '4' + digits[5:]
+    
+    if digits.startswith('421'):
+        return digits
+
+    return digits
 
 
 
-@app.route('/qrcode', methods=['GET'])
-def generate_qr():
-    # Extract and validate parameters
+def generate_qr_with_params(data, format='png', fill_color='black', back_color='white', box_size=10, border=4, error_correction='H'):
     try:
-        data = unquote(request.args.get('url', 'https://www.google.sk'))
-        format = request.args.get('format', 'png')
-        fill_color = request.args.get('fill', 'black')
-        back_color = request.args.get('background', 'white')
+        print("📦 Generating QR with dynamic version...")
 
-        version = int(request.args.get('version', 2))
-        if not (1 <= version <= 40):
-            return {"error": "Version must be an integer between 1 and 40."}, 400
-        
         error_correction_map = {
             'L': qrcode.constants.ERROR_CORRECT_L,
             'M': qrcode.constants.ERROR_CORRECT_M,
             'Q': qrcode.constants.ERROR_CORRECT_Q,
             'H': qrcode.constants.ERROR_CORRECT_H,
         }
-        error_correction_key = request.args.get('error_correction', 'H')
-        if error_correction_key not in error_correction_map:
-            return {"error": "Invalid error_correction value. Use 'L', 'M', 'Q', or 'H'."}, 400
-        error_correction = error_correction_map[error_correction_key]
-        
-        box_size = int(request.args.get('box_size', 10))
-        border = int(request.args.get('border', 4))
+        error_correction_level = error_correction_map.get(error_correction, qrcode.constants.ERROR_CORRECT_H)
 
-        qr = qrcode.QRCode(
-            version=version,
-            error_correction=error_correction,
-            box_size=box_size,
-            border=border,
-        )
-        qr.add_data(data)
-        qr.make(fit=True)
-
-        # Generate QR code
         if format == 'png':
+            # použi bezpečný spôsob bez self.version
+            qr = qrcode.QRCode(
+                error_correction=error_correction_level,
+                box_size=box_size,
+                border=border,
+            )
+            qr.add_data(data.encode('utf-8'))
+            qr.make(fit=True)  # bezpečné – QRCode práve bol vytvorený čisto
             img = qr.make_image(fill_color=fill_color, back_color=back_color)
             buf = io.BytesIO()
             img.save(buf, format="PNG")
             buf.seek(0)
+            print("✅ Returning PNG QR")
             return send_file(buf, mimetype='image/png', as_attachment=False, download_name='qrcode.png')
-        
-        
-        elif format == 'svg':
-            factory = qrcode.image.svg.SvgPathImage
-            img_svg = qrcode.make(data, image_factory=factory)
 
-            # Generate the SVG as a string
+        elif format == 'svg':
+            # qrcode.make vytvorí všetko automaticky
+            factory = qrcode.image.svg.SvgPathImage
+            img_svg = qrcode.make(data.encode('utf-8'), image_factory=factory)
             buf = io.BytesIO()
             img_svg.save(buf)
             buf.seek(0)
             svg_data = buf.getvalue().decode('utf-8')
 
-            # Parse the SVG to modify the path fill attributes
+            # Upraviť farby
             root = ET.fromstring(svg_data)
             for path in root.findall('.//{http://www.w3.org/2000/svg}path'):
                 path.set('fill', fill_color)
 
-            # Add the background color using a <rect> element
             background_rect = ET.Element(
                 '{http://www.w3.org/2000/svg}rect',
-                attrib={
-                    'width': '100%',
-                    'height': '100%',
-                    'fill': back_color,
-                }
+                attrib={'width': '100%', 'height': '100%', 'fill': back_color}
             )
-            root.insert(0, background_rect)  # Insert background as the first element
+            root.insert(0, background_rect)
 
-            # Convert the modified SVG tree back to a string
             modified_svg_data = ET.tostring(root, encoding='unicode')
-
-            # Serve the modified SVG
+            print("✅ Returning SVG QR")
             return send_file(
                 io.BytesIO(modified_svg_data.encode('utf-8')),
                 mimetype='image/svg+xml',
@@ -113,14 +112,36 @@ def generate_qr():
                 download_name='qrcode.svg'
             )
 
-
-
         else:
             return {"error": "Unsupported format. Use 'png' or 'svg'."}, 400
-    except ValueError as ve:
-        return {"error": f"Invalid parameter value: {ve}"}, 400
+
     except Exception as e:
+        print("❌ Error in generate_qr_with_params:")
+        import traceback; traceback.print_exc()
         return {"error": f"An unexpected error occurred: {e}"}, 500
+
+def styling(encoded_data, format='svg', fill_color='black', back_color='white', box_size=10, border=4):
+    return generate_qr_with_params(
+        encoded_data, format, fill_color, back_color, box_size, border
+    )
+
+
+
+
+
+
+@app.route('/qrcode')
+def generate_qr():
+    return generate_qr_with_params(
+        data=unquote(request.args.get('url', 'https://www.google.com')),
+        format=request.args.get('format', 'svg'),
+        fill_color=request.args.get('fill', 'black'),
+        back_color=request.args.get('background', 'white'),
+        box_size=int(request.args.get('box_size', 10)),
+        border=int(request.args.get('border', 4)),
+        error_correction=request.args.get('error_correction', 'H')
+    )
+
 
 @app.route('/wifi', methods=['GET', 'POST'])
 def generate_wifi_qr():
@@ -162,11 +183,11 @@ def generate_wifi_qr():
 
 
 
-
 @app.route('/vcard', methods=['GET', 'POST'])
 def generate_vcard_with_photo():
     try:
         request_data = request.get_json() if request.method == 'POST' else request.args
+        print("📥 Request data received:", dict(request_data))
 
         # Basic contact details
         name = request_data.get('name', '').strip()
@@ -177,7 +198,6 @@ def generate_vcard_with_photo():
         website = request_data.get('website', '').strip()
         address = request_data.get('address', '').strip()
 
-        # Validate required fields
         if not name or not phone:
             return {"error": "Name and phone are required fields for vCard."}, 400
 
@@ -186,46 +206,70 @@ def generate_vcard_with_photo():
         first_name = name_parts[0]
         last_name = name_parts[1] if len(name_parts) > 1 else ""
 
-        # Build vCard lines
+        print("👤 Generating vCard...")
         vcard_lines = [
             "BEGIN:VCARD",
-            "VERSION:4.0",
-            f"N:{last_name};{first_name};;;",
-            f"FN:{name}",
+            "VERSION:3.0",
+            f"N;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:{qp_utf8(last_name)};{qp_utf8(first_name)};;;",
+            f"FN;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:{qp_utf8(name)}",
             f"TEL:{phone}",
         ]
 
         if email:
             vcard_lines.append(f"EMAIL:{email}")
         if company:
-            vcard_lines.append(f"ORG:{company}")
+            vcard_lines.append(f"ORG;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:{qp_utf8(company)}")
         if title:
-            vcard_lines.append(f"TITLE:{title}")
+            vcard_lines.append(f"TITLE;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:{qp_utf8(title)}")
         if website:
             vcard_lines.append(f"URL:{website}")
         if address:
-            vcard_lines.append(f"ADR:;;{address}")
-
-        # # Always use the placeholder Base64 image
-        # vcard_lines.append(f"PHOTO;ENCODING=b;MEDIATYPE=image/jpeg:{placeholder_photo_base64}")
+            vcard_lines.append(f"ADR;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:;;{qp_utf8(address)}")
 
         vcard_lines.append("END:VCARD")
         vcard_data = "\n".join(vcard_lines)
 
-        # QR styling params
         format = request_data.get('format', 'svg')
         fill_color = request_data.get('fill', 'black')
         back_color = request_data.get('background', 'white')
         box_size = int(request_data.get('box_size', 10))
         border = int(request_data.get('border', 4))
 
-        # Send vCard string to styling()
-        return styling(vcard_data, format, fill_color, back_color, box_size, border)
+        return generate_qr_with_params(vcard_data, format, fill_color, back_color, box_size, border)
+
+    except ValueError as ve:
+        print("❌ ValueError:", ve)
+        return {"error": f"Invalid parameter value: {ve}"}, 400
+    except Exception as e:
+        print("❌ Exception occurred:")
+        traceback.print_exc()
+        return {"error": f"An unexpected error occurred: {e}"}, 500
+
+@app.route('/whatsapp', methods=['GET', 'POST'])
+def generate_whatsapp_qr():
+    try:
+        request_data = request.get_json() if request.method == 'POST' else request.args
+
+        raw_phone = request_data.get('phone', '')
+        phone = normalize_phone(raw_phone)
+
+        message = request_data.get('message', 'Hello!')
+        format = request_data.get('format', 'svg')
+        fill_color = request_data.get('fill', 'black')
+        back_color = request_data.get('background', 'white')
+        box_size = int(request_data.get('box_size', 10))
+        border = int(request_data.get('border', 4))
+
+        encoded_message = quote(message)
+        qr_data = f"https://wa.me/{phone}?text={encoded_message}"
+
+        return styling(qr_data, format, fill_color, back_color, box_size, border)
 
     except ValueError as ve:
         return {"error": f"Invalid parameter value: {ve}"}, 400
     except Exception as e:
         return {"error": f"An unexpected error occurred: {e}"}, 500
+
 
 @app.route('/email', methods=['GET', 'POST'])
 def generate_email_qr():
@@ -318,36 +362,6 @@ def generate_sms_qr():
     except Exception as e:
         return {"error": f"An unexpected error occurred: {e}"}, 500
 
-
-@app.route('/whatsapp', methods=['GET', 'POST'])
-def generate_whatsapp_qr():
-    try:
-        # Handle GET and POST requests
-        if request.method == 'POST':
-            request_data = request.get_json()
-        elif request.method == 'GET':
-            request_data = request.args
-
-        # Extract phone number, message, and QR code styling options
-        phone = request_data.get('phone', '1234567890')  # Default phone number
-        message = request_data.get('message', 'Hello!')  # Default message
-        format = request_data.get('format', 'svg')  # Default QR code format
-        fill_color = request_data.get('fill', 'black')  # Default fill color
-        back_color = request_data.get('background', 'white')  # Default background color
-        box_size = int(request_data.get('box_size', 10))  # Default box size
-        border = int(request_data.get('border', 4))  # Default border size
-
-        # Format the WhatsApp API URL
-        encoded_message = message.replace(' ', '%20')  # URL-encode spaces
-        qr_data = f"https://wa.me/{phone}?text={encoded_message}"
-
-        # Generate and style the QR code
-        return styling(qr_data, format, fill_color, back_color, box_size, border)
-
-    except ValueError as ve:
-        return {"error": f"Invalid parameter value: {ve}"}, 400
-    except Exception as e:
-        return {"error": f"An unexpected error occurred: {e}"}, 500
 
 
 @app.route('/discord', methods=['GET', 'POST'])
@@ -624,49 +638,55 @@ def qr_platba():
 @app.route('/sepa', methods=['GET', 'POST'])
 def generate_sepa_payment_qr():
     try:
-        # Handle GET and POST requests
-        if request.method == 'POST':
-            request_data = request.get_json()
-        elif request.method == 'GET':
-            request_data = request.args
+        request_data = request.get_json() if request.method == 'POST' else request.args
+        print("Request received:", request_data)
 
-        # Extract SEPA payment details
-        creditor_name = request_data.get('creditor_name', 'Default Creditor')  # Creditor's name
-        creditor_iban = request_data.get('creditor_iban', 'BE72000000001616')  # Creditor's IBAN
-        creditor_bic = request_data.get('creditor_bic', 'BPOTBEB1')  # Creditor's BIC
-        amount = request_data.get('amount', '1.00')  # Amount in euros
-        remittance_information = request_data.get('remittance_information', 'Sample EPC QR code')  # Payment details
-        reason = request_data.get('reason', 'CHAR')  # Reason (4 characters max)
-        ref_invoice = request_data.get('ref_invoice', '')  # Reference or empty line
+        # Fallback function for safe fallback value
+        def fallback(val, default):
+            return val if val and val.strip() else default
 
-        # Extract QR code styling options
-        format = request_data.get('format', 'svg')  # Default QR code format
-        fill_color = request_data.get('fill', 'black')  # Default fill color
-        back_color = request_data.get('background', 'white')  # Default background color
-        box_size = int(request_data.get('box_size', 10))  # Default box size
-        border = int(request_data.get('border', 4))  # Default border size
+        # Basic fields
+        creditor_name = request_data.get('creditor_name') or 'Default Creditor'
+        creditor_iban = request_data.get('iban') or 'SK6802000000001234567890'
+        creditor_bic = request_data.get('bic') or 'UNCRSKBX'
+        reference = request_data.get('reference') or ''
+        remittance_info = request_data.get('remittance_information') or ''
+        amount = "{:.2f}".format(float(request_data.get('amount') or '1.00'))
 
-        # Generate SEPA payment QR data following EPC format
-        qr_data = f"""BCD
-001
-1
-SCT
-{creditor_bic}
-{creditor_name}
-{creditor_iban}
-EUR{amount}
-{reason}
-{ref_invoice}
-{remittance_information}
-"""
 
-        # Generate and style the QR code
-        return styling(qr_data, format, fill_color, back_color, box_size, border)
+        # QR styling
+        format = fallback(request_data.get('format'), 'svg')
+        fill_color = fallback(request_data.get('fill'), 'black')
+        back_color = fallback(request_data.get('background'), 'white')
+        box_size = int(fallback(request_data.get('box_size'), 10))
+        border = int(fallback(request_data.get('border'), 4))
+
+        # EPC QR data
+        epc_qr_data = "\n".join([
+            "BCD",
+            "001",
+            "1",
+            "SCT",
+            creditor_bic,
+            creditor_name,
+            creditor_iban,
+            f"EUR{amount}",
+            reference,
+            remittance_info
+        ])
+
+        print("Generated EPC QR string:")
+        print(epc_qr_data)
+
+        return styling(epc_qr_data, format, fill_color, back_color, box_size, border)
 
     except ValueError as ve:
-        return {"error": f"Invalid parameter value: {ve}"}, 400
+        return {"error": f"Invalid value: {ve}"}, 400
     except Exception as e:
-        return {"error": f"An unexpected error occurred: {e}"}, 500
+        import traceback
+        traceback.print_exc()
+        return {"error": f"Unexpected error: {e}"}, 500
+
 
 
 @app.route('/revolut', methods=['GET', 'POST'])
@@ -1180,17 +1200,6 @@ def generate_apple_maps_route_qr():
 
 
 
-def styling(encoded_data, format='svg', fill_color='black', back_color='white', box_size=10, border=4):
-    request.args = request.args.copy()
-    request.args.update({
-        'url': encoded_data,
-        'format': format,
-        'fill': fill_color,
-        'background': back_color,
-        'box_size': box_size,
-        'border': border,
-    })
-    return generate_qr()
 
 
 if __name__ == '__main__':

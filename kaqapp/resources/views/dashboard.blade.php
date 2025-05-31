@@ -107,14 +107,24 @@
                             <form id="dynamic-form">
                                 ${data.form_fields.map(field => `
                                     <div class="field-holder">
-                                        <input 
-                                            type="${field.type}" 
-                                            class="form-control" 
-                                            id="${field.label.toLowerCase().replace(/\s+/g, '_')}" 
-                                            name="${field.label.toLowerCase().replace(/\s+/g, '_')}" 
-                                            ${field.required ? 'required' : ''}
-                                            value="${field.value || ''}"
-                                        >
+                                        ${
+                                            field.type === 'textarea'
+                                            ? `<textarea 
+                                                    class="form-control" 
+                                                    id="${field.label.toLowerCase().replace(/\s+/g, '_')}" 
+                                                    name="${field.label.toLowerCase().replace(/\s+/g, '_')}" 
+                                                    ${field.required ? 'required' : ''}
+                                                    rows="4"
+                                                >${field.value || ''}</textarea>`
+                                            : `<input 
+                                                    type="${field.type}" 
+                                                    class="form-control" 
+                                                    id="${field.label.toLowerCase().replace(/\s+/g, '_')}" 
+                                                    name="${field.label.toLowerCase().replace(/\s+/g, '_')}" 
+                                                    ${field.required ? 'required' : ''}
+                                                    value="${field.value || ''}"
+                                                >`
+                                        }
                                         <label for="${field.label.toLowerCase().replace(/\s+/g, '_')}" class="form-label">
                                             ${field.label}
                                         </label>
@@ -155,7 +165,6 @@
             if (!form) return;
 
             form.querySelectorAll('input, textarea').forEach(field => {
-                // Apply 'has-value' class for prefilled inputs
                 if (field.value.trim() !== "") {
                     field.classList.add('has-value');
                 }
@@ -187,9 +196,9 @@
             const typeId = document.querySelector('.nav-link.active')?.getAttribute('data-id') || null;
 
             // Collect form data
-            document.querySelectorAll('#dynamic-form input').forEach(field => {
-                formData[field.name] = field.value;
-            });
+            document.querySelectorAll('#dynamic-form input, #dynamic-form textarea').forEach(field => {
+                    formData[field.name] = field.value;
+                });
 
             // Collect styling data
             const styleData = {

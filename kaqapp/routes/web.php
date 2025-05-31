@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DocController;
+
 use App\Models\QrCodeType;
 
 
@@ -18,6 +20,8 @@ Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 Route::post('/contact', [ContactController::class, 'submit'])->name('contact.submit');
 
 Route::get('/create', [DashboardController::class, 'index'])->name('create');
+
+Route::get('/documentation', [DocController::class, 'index'])->name('documentation');
 
 Route::get('/api/types/{id}', function ($id) {
     $type = QrCodeType::with('formFields')->findOrFail($id);

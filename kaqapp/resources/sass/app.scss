@@ -375,9 +375,10 @@ body.create {
     .trim {
         display: -webkit-box;
         -webkit-box-orient: vertical;
+        -webkit-line-clamp: 4;
+        line-clamp: 4;
         overflow: hidden;
         text-overflow: ellipsis;
-        white-space: normal;
     }
 
     #text {
@@ -399,14 +400,16 @@ body.create {
         margin-bottom: 1.5rem;
     }
 
-    input:focus {
+    input:focus,
+    textarea:focus {
         outline: none;
         border-bottom: solid 1px #47663B;
         box-shadow: none !important;
         background: #fff;
     }
 
-    input {
+    input,
+    textarea {
         border: none;
         border-bottom: 1px solid #000;
         outline: none;
@@ -416,11 +419,15 @@ body.create {
         background: #fff;
     }
 
-    .form-label {
+    textarea {
+        resize: none;
+    }
+
+    label {
         position: absolute;
-        top: 0.5rem;
+        top: 0;
         left: 10px;
-        font-size: 0.8rem;
+        font-size: 1rem;
         font-weight: 500;
         color: #000;
         text-transform: uppercase;
@@ -431,9 +438,11 @@ body.create {
         cursor: text;
     }
 
-    input:focus+.form-label,
-    input.has-value+.form-label {
-        top: -1rem;
+    input:focus+label,
+    textarea:focus+label,
+    input.has-value+label,
+    textarea.has-value+label {
+        top: -1.5rem;
         font-size: 0.8rem;
         pointer-events: none;
     }

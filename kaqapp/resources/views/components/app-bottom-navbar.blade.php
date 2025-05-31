@@ -1,9 +1,8 @@
 <nav class="navbar fixed-bottom navbar-light justify-content-end">
     <a href="{{ route('create') }}" class="navbar-link dark">Create</a>
-    <a href="#" class="navbar-link">Docs</a>
+    <a href="{{ route('documentation') }}" class="navbar-link">Docs</a>
     <a href="{{ route('contact') }}" class="navbar-link">Get in Touch</a>
     <a href="{{ route('mission') }}" class="navbar-link">Our Mission</a>
-
 </nav>
 
 <style>
