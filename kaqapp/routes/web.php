@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocController;
+use App\Http\Controllers\StoriesController;
 
 use App\Models\QrCodeType;
 
@@ -22,6 +23,12 @@ Route::post('/contact', [ContactController::class, 'submit'])->name('contact.sub
 Route::get('/create', [DashboardController::class, 'index'])->name('create');
 
 Route::get('/documentation', [DocController::class, 'index'])->name('documentation');
+
+Route::get('/story1', [StoriesController::class, 'story1'])->name('story1');
+Route::get('/story2', [StoriesController::class, 'story2'])->name('story2');
+Route::get('/story3', [StoriesController::class, 'story3'])->name('story3');
+
+
 
 Route::get('/api/types/{id}', function ($id) {
     $type = QrCodeType::with('formFields')->findOrFail($id);

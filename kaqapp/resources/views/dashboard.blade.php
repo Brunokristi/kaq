@@ -75,6 +75,11 @@
     </div>
 </div>
 
+<div class="mobile-warning d-md-none text-center p-4">
+    <h5 class="text-danger">Please use a desktop device to generate QR codes.</h5>
+    <p>QR code customization and downloads are available only on larger screens for the best experience.</p>
+</div>
+
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         let qrCodeBaseUrl = '/qrcode';

@@ -22,28 +22,25 @@
             <div class="row align-items-start">
                 <!-- Column 1 -->
                 <div class="col-sm-4">
-                    <a href="#" class="solid">{{ __('homepage.contacts') }}</a>
-                    <a href="#" class="border">{{ __('homepage.vcard') }}</a>
-                    <a href="#" class="border">{{ __('homepage.email') }}</a>
-                    <a href="#" class="border">{{ __('homepage.discord') }}</a>
+                    <a href="{{ route('create') }}" class="solid">{{ __('homepage.contacts') }}</a>
+                    <a href="{{ route('create') }}" class="border">{{ __('homepage.vcard') }}</a>
+                    <a href="{{ route('create') }}" class="border">{{ __('homepage.email') }}</a>
                 </div>
                 <!-- Column 2 -->
                 <div class="col-sm-4">
-                    <a href="#" class="solid">{{ __('homepage.finance') }}</a>
-                    <a href="#" class="border">{{ __('homepage.pay_by_square') }}</a>
-                    <a href="#" class="border">{{ __('homepage.qr_pay') }}</a>
-                    <a href="#" class="border">{{ __('homepage.google_pay') }}</a>
+                    <a href="{{ route('create') }}" class="solid">{{ __('homepage.finance') }}</a>
+                    <a href="{{ route('create') }}" class="border">{{ __('homepage.pay_by_square') }}</a>
+                    <a href="{{ route('create') }}" class="border">{{ __('homepage.qr_pay') }}</a>
                 </div>
                 <!-- Column 3 -->
                 <div class="col-sm-4">
-                    <a href="#" class="solid">{{ __('homepage.calendar') }}</a>
-                    <a href="#" class="border">{{ __('homepage.events') }}</a>
-                    <a href="#" class="border">{{ __('homepage.reminders') }}</a>
-                    <a href="#" class="border">{{ __('homepage.invitations') }}</a>
+                    <a href="{{ route('create') }}" class="solid">{{ __('homepage.calendar') }}</a>
+                    <a href="{{ route('create') }}" class="border">{{ __('homepage.events') }}</a>
+                    <a href="{{ route('create') }}" class="border">{{ __('homepage.reminders') }}</a>
                 </div>
             </div>
         </div>
-        <a href="#">{{ __('homepage.check_more') }}<i class="bi bi-arrow-right"></i></a>
+        <a href="{{ route('create') }}">{{ __('homepage.check_more') }}<i class="bi bi-arrow-right"></i></a>
     </div>
 
     <!-- API Docs Section -->
@@ -54,12 +51,12 @@
                 <div class="row align-items-start">
                     <div class="col-sm-4"></div>
                     <div class="col-sm-4">
-                        <a href="#" class="solid">{{ __('homepage.api_docs') }}</a>
+                        <a href="{{ route('documentation') }}" class="solid">{{ __('homepage.api_docs') }}</a>
                     </div>
                     <div class="col-sm-4"></div>
                 </div>
             </div>
-            <a class="api-section" href="#">{{ __('homepage.get_started') }}<i class="bi bi-arrow-right api-section"></i></a>
+            <a class="api-section" href="{{ route('documentation') }}">{{ __('homepage.get_started') }}<i class="bi bi-arrow-right api-section"></i></a>
         </div>
     </div>
 
@@ -103,13 +100,50 @@
                     </div>
                 </div>
             </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingFourFirst">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFourFirst" aria-expanded="false" aria-controls="collapseFourFirst">
+                        {{ __('homepage.faq_question_4') }}
+                    </button>
+                </h2>
+                <div id="collapseFourFirst" class="accordion-collapse collapse" data-bs-parent="#firstAccordion">
+                    <div class="accordion-body">
+                        {{ __('homepage.faq_answer_4') }}
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingFiveFirst">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFiveFirst" aria-expanded="false" aria-controls="collapseFiveFirst">
+                        {{ __('homepage.faq_question_5') }}
+                    </button>
+                </h2>
+                <div id="collapseFiveFirst" class="accordion-collapse collapse" data-bs-parent="#firstAccordion">
+                    <div class="accordion-body">
+                        {{ __('homepage.faq_answer_5') }}
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingSixFirst">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSixFirst" aria-expanded="false" aria-controls="collapseSixFirst">
+                        {{ __('homepage.faq_question_6') }}
+                    </button>
+                </h2>
+                <div id="collapseSixFirst" class="accordion-collapse collapse" data-bs-parent="#firstAccordion">
+                    <div class="accordion-body">
+                        {{ __('homepage.faq_answer_6') }}
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
     <!-- Contact Section -->
     <div class="row text-center p-4">
         <p>{{ __('homepage.not_found') }}</p>
-        <a href="#">{{ __('homepage.contact') }}<i class="bi bi-arrow-right"></i></a>
+        <a href="{{ route('contact') }}">{{ __('homepage.contact') }}<i class="bi bi-arrow-right"></i></a>
     </div>
 
     <!-- Stories Section -->
@@ -123,7 +157,7 @@
                     <img src="{{ asset('assets/stories-cook.jpg') }}" class="card-img-top" alt="{{ __('homepage.story_chef_alt') }}">
                     <div class="card-body">
                         <p class="card-text">{{ __('homepage.story_chef') }}</p>
-                        <a href="#"><i class="bi bi-arrow-right"></i></a>
+                        <a href="{{ route('story1') }}"><i class="bi bi-arrow-right"></i></a>
                     </div>
                 </div>
             </div>
@@ -133,7 +167,7 @@
                     <img src="{{ asset('assets/stories-yoga.jpg') }}" class="card-img-top" alt="{{ __('homepage.story_yoga_alt') }}">
                     <div class="card-body">
                         <p class="card-text">{{ __('homepage.story_yoga') }}</p>
-                        <a href="#"><i class="bi bi-arrow-right"></i></a>
+                        <a href="{{ route('story2') }}"><i class="bi bi-arrow-right"></i></a>
                     </div>
                 </div>
             </div>
@@ -143,7 +177,7 @@
                     <img src="{{ asset('assets/stories-flower.jpg') }}" class="card-img-top" alt="{{ __('homepage.story_flower_alt') }}">
                     <div class="card-body">
                         <p class="card-text">{{ __('homepage.story_flower') }}</p>
-                        <a href="#"><i class="bi bi-arrow-right"></i></a>
+                        <a href="{{ route('story3') }}"><i class="bi bi-arrow-right"></i></a>
                     </div>
                 </div>
             </div>

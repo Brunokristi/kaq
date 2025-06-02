@@ -54,4 +54,22 @@ return [
     'story_yoga' => 'I grew my passion into a job',
     'story_flower_alt' => 'Flower Shop Story',
     'story_flower' => 'I managed to get enough customers',
+
+    'faq_question_1' => "Do I need to sign up or log in?",
+    'faq_answer_1' => "No. You can use all features instantly without creating an account or entering any email.",
+
+    'faq_question_2' => "Is the QR code generator completely free?",
+    'faq_answer_2' => "Yes. It's 100% free to use with no hidden fees, subscriptions, or ads.",
+
+    'faq_question_3' => "Can I customize the QR code design?",
+    'faq_answer_3' => "Yes. You can change the foreground and background color, border size, and image format (PNG or SVG).",
+
+    'faq_question_4' => "What types of QR codes can I create?",
+    'faq_answer_4' => "You can generate QR codes for URLs, contacts (vCard), emails, Wi-Fi access, payments (PayPal, Revolut, PayBySquare, QR Platba CZ), calendar events, and maps.",
+
+    'faq_question_5' => "Can I print or use the QR codes commercially?",
+    'faq_answer_5' => "Yes. All generated QR codes are yours to use for flyers, business cards, posters, or commercial projects.",
+
+    'faq_question_6' => "How do I start using the API?",
+    'faq_answer_6' => "Just visit the API documentation section.",
 ];
