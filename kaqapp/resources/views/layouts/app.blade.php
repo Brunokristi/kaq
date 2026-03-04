@@ -1,72 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'My Laravel App')</title>
-    
-    <!-- Fonts and Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Krona+One&family=Inter:wght@400;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" defer></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>@yield('title', 'kaq')</title>
 
-    
-    <!-- Vite -->
-    @vite(['resources/js/app.js'])
-    @vite('resources/sass/app.scss')
+  <link href="https://fonts.googleapis.com/css2?family=Krona+One&family=Inter:wght@400;700&display=swap" rel="stylesheet">
 
+  @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="{{ Route::is('create') ? 'create' : '' }}">
-    <!-- Top Navbar -->
-    <x-app-navbar />
-    
-    <!-- Main Content -->
-    <main>
-        @yield('content')
-    </main>
-    
-    <!-- Bottom Navbar -->
-    <x-app-bottom-navbar />
-</body>
-<style>
-body {
-    padding: 46px 10rem;
-    margin: 0;
-    box-sizing: border-box;
-    font-family: 'Inter', sans-serif;
-    background: #fff;
-}
 
-h1, h2, h3 {
-    text-transform: uppercase;
-    color: #000;
-}
+    <body class="font-sans bg-white m-0 box-border h-screen flex flex-col overflow-hidden">
+        <x-navbar />
 
-h2 {
-    font-size: 1rem !important;
-    font-weight: 400 !important;
-}
+        <main class="flex flex-1 min-h-0">
+            <div id="sidebar" class="w-72 border-r border-black overflow-y-auto min-h-0 transition-all duration-300">
+                <x-sidebar />
+            </div>
 
-h1 {
-    font-size: 1.3rem !important;
-}
+            <div id="content" class="flex-1 overflow-y-auto min-h-0">
+                @yield('content')
+            </div>
+        </main>
 
-h3 {
-    font-size: 0.9rem !important;
-    text-transform: uppercase;
-}
-
-p {
-    font-size: 0.9rem !important;
-}
-
-@media (max-width: 768px) {
-    body {
-        padding: 46px 1rem;
-    }
-}
-</style>
+        <x-footer />
+    </body>
 </html>

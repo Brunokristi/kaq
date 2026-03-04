@@ -1,3 +1,31 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    body {
+        @apply font-sans;
+    }
+
+    h1,
+    h2,
+    h3 {
+        @apply uppercase text-black;
+    }
+
+    h1 {
+        @apply text-[1.3rem];
+    }
+
+    h2 {
+        @apply text-[1rem] font-normal;
+    }
+
+    h3 {
+        @apply text-[0.9rem];
+    }
+
+    p {
+        @apply text-[0.9rem];
+    }
+}

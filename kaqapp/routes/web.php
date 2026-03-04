@@ -10,23 +10,13 @@ use App\Models\QrCodeType;
 
 
 Route::get('/', function () {
-    return view('homepage');
+    return view('dashboard');
 });
-
-Route::get('/mission', function () {
-    return view('mission');
-})->name('mission');
 
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 Route::post('/contact', [ContactController::class, 'submit'])->name('contact.submit');
-
 Route::get('/create', [DashboardController::class, 'index'])->name('create');
-
 Route::get('/documentation', [DocController::class, 'index'])->name('documentation');
-
-Route::get('/story1', [StoriesController::class, 'story1'])->name('story1');
-Route::get('/story2', [StoriesController::class, 'story2'])->name('story2');
-Route::get('/story3', [StoriesController::class, 'story3'])->name('story3');
 
 
 

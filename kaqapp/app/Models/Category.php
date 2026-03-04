@@ -11,7 +11,6 @@ class Category extends Model
 
     protected $fillable = ['name'];
 
-    // Define the relationship with QrCodeType
     public function qrCodeTypes()
     {
         return $this->hasMany(QrCodeType::class);

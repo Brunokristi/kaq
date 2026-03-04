@@ -1,19 +1,24 @@
-/**
- * First we will load all of this project's JavaScript dependencies which
- * includes Vue and other libraries. It is a great starting point when
- * building robust, powerful web applications using Vue and Laravel.
- */
+import '../css/app.css'
+import 'bootstrap-icons/font/bootstrap-icons.css'
 
-import './bootstrap';
 
-/**
- * Next, we will create a fresh Vue application instance. You may then begin
- * registering components with the application instance so they are ready
- * to use in your application's views. An example is included for you.
- */
+document.addEventListener("DOMContentLoaded", () => {
 
-/**
- * Finally, we will attach the application instance to a HTML element with
- * an "id" attribute of "app". This element is included with the "auth"
- * scaffolding. Otherwise, you will need to add an element yourself.
- */
+    const toggle = document.getElementById("menu-toggle");
+    const sidebar = document.getElementById("sidebar");
+
+    toggle?.addEventListener("click", () => {
+
+        if (sidebar.classList.contains("w-0")) {
+            sidebar.classList.remove("w-0");
+            sidebar.classList.add("w-64");
+            toggle.classList.add("bi-x");
+        } else {
+            sidebar.classList.remove("w-64");
+            sidebar.classList.add("w-0");
+            toggle.classList.remove("bi-x");
+        }
+
+    });
+
+});
