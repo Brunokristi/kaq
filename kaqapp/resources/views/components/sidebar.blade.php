@@ -33,32 +33,4 @@
       <h5 class="mb-2">QR Types</h5>
       <p class="text-gray-500">No categories / types yet. Add some QR code types to start.</p>
     @endif
-  </div>
 </nav>
-
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-
-    document.querySelectorAll(".sidebar-toggle").forEach(toggle => {
-
-        toggle.addEventListener("click", () => {
-
-        const content = toggle.nextElementSibling;
-        const icon = toggle.querySelector("i");
-
-        content.classList.toggle("hidden");
-
-        if (content.classList.contains("hidden")) {
-            icon.classList.remove("bi-dash-lg");
-            icon.classList.add("bi-plus-lg");
-        } else {
-            icon.classList.remove("bi-plus-lg");
-            icon.classList.add("bi-dash-lg");
-        }
-
-        });
-
-    });
-
-    });
-</script>

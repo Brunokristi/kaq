@@ -7,7 +7,7 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Krona+One&family=Inter:wght@400;700&display=swap" rel="stylesheet">
 
-  @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 </head>
 
     <body class="font-sans bg-white m-0 box-border h-screen flex flex-col overflow-hidden">

@@ -28,4 +28,67 @@
     p {
         @apply text-[0.9rem];
     }
+
+    input[type="color"] {
+        padding: 0;
+        border: none;
+    }
+
+    input[type="color"]::-webkit-color-swatch-wrapper {
+        padding: 0;
+    }
+
+    input[type="color"]::-webkit-color-swatch {
+        border: 1px solid black;
+    }
+
+    /* WebKit browsers */
+    ::-webkit-scrollbar {
+        width: 1px !important;
+        height: 1px !important;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background-color: black;
+        border-radius: 0;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background-color: black;
+    }
+
+    /* Firefox */
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: black transparent;
+    }
+}
+
+@layer components {
+
+    .slider {
+        @apply w-full bg-transparent appearance-none cursor-pointer;
+    }
+
+    /* Track */
+    .slider::-webkit-slider-runnable-track {
+        height: 0.5px;
+        background: black;
+    }
+
+    /* Thumb */
+    .slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        @apply w-3 h-3 bg-black border border-black cursor-pointer rounded-full;
+        margin-top: -5px;
+    }
+
+    .slider::-moz-range-thumb {
+        @apply w-3 h-3 bg-black border border-black cursor-pointer rounded-full;
+    }
+
 }

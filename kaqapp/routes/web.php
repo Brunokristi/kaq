@@ -21,20 +21,33 @@ Route::get('/documentation', [DocController::class, 'index'])->name('documentati
 
 
 Route::get('/api/types/{id}', function ($id) {
-    $type = QrCodeType::with('formFields')->findOrFail($id);
+    try {
+        $type = QrCodeType::with('formFields')->find($id);
 
-    return response()->json([
-        'name' => $type->name,
-        'description' => $type->description,
-        'url' => $type->url,
-        'form_fields' => $type->formFields->map(function ($field) {
-            return [
-                'label' => $field->label,
-                'type' => $field->type,
-                'required' => $field->required,
-                'placeholder' => $field->placeholder,
-                'value' => $field->value
-            ];
-        }),
-    ]);
+        if (!$type) {
+            return response()->json([
+                'error' => 'QR code type not found',
+            ], 404);
+        }
+
+        return response()->json([
+            'name' => $type->name,
+            'description' => $type->description,
+            'url' => $type->url,
+            'form_fields' => $type->formFields->map(function ($field) {
+                return [
+                    'label' => $field->label,
+                    'type' => $field->type,
+                    'required' => $field->required,
+                    'placeholder' => $field->placeholder,
+                    'value' => $field->value,
+                    'help_text' => $field->help_text,
+                ];
+            }),
+        ]);
+    } catch (\Throwable $exception) {
+        return response()->json([
+            'error' => 'Failed to fetch QR code type',
+        ], 500);
+    }
 });
