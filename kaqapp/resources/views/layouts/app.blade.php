@@ -11,6 +11,20 @@
 </head>
 
     <body class="font-sans bg-white m-0 box-border h-screen flex flex-col overflow-hidden">
+        <div id="toast-container" class="pointer-events-none fixed top-4 right-4 z-50 flex w-[calc(100%-2rem)] max-w-sm flex-col gap-2 sm:w-full">
+            @if(session('success'))
+                <x-toast type="success" :message="session('success')" />
+            @endif
+
+            @if(session('error'))
+                <x-toast type="error" :message="session('error')" />
+            @endif
+
+            @if($errors->any())
+                <x-toast type="error" :message="$errors->first()" :autoclose="6000" />
+            @endif
+        </div>
+
         <x-navbar />
 
         <main class="flex flex-1 min-h-0">

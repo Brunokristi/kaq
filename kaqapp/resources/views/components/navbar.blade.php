@@ -2,7 +2,7 @@
 
     <i id="menu-toggle" class="bi bi-list cursor-pointer text-black hover:text-brand text-xl"></i>
     
-    <a href="/" class="absolute left-1/2 -translate-x-1/2 flex items-center">
+    <a href="{{ route('home') }}" class="absolute left-1/2 -translate-x-1/2 flex items-center">
         <img src="{{ asset('assets/logo_green-white.svg') }}" alt="Logo" class="h-8">
     </a>
 

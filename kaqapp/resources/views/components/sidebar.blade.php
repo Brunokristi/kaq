@@ -19,7 +19,7 @@
 
                 <div class="flex flex-col gap-1 hidden sidebar-content">
                     @foreach($types as $type)
-                    <a href="#" data-id="{{ $type->id }}"
+                    <a href="{{ route('home', ['type' => $type->id]) }}" data-id="{{ $type->id }}"
                         class="px-3 py-2 rounded-md text-xs text-black hover:text-brand hover:underline">
                         {{ $type->name }}
                     </a>

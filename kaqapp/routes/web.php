@@ -11,7 +11,7 @@ use App\Models\QrCodeType;
 
 Route::get('/', function () {
     return view('dashboard');
-});
+})->name('home');
 
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 Route::post('/contact', [ContactController::class, 'submit'])->name('contact.submit');

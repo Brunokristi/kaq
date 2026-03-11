@@ -28,7 +28,7 @@
 
         @if(session('success'))
             <div class="success-message">
-                Message sent. We will get back to you soon.  <br><a href="/">home <i class="bi bi-arrow-right"></i></a>
+                Message sent. We will get back to you soon.  <br><a href="{{ route('home') }}">home <i class="bi bi-arrow-right"></i></a>
             </div>
         @endif
 
