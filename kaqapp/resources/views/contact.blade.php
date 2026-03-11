@@ -3,53 +3,59 @@
 @section('title', 'Contact Us')
 
 @section('content')
-<div class="contact">
-    <div class="contact-page">
-        <h2>Contact Us</h2>
-        <form action="{{ route('contact.submit') }}" method="POST">
-            @csrf
-            <div class="field-holder">
-                <input type="text" class="form-control" id="name" name="name" required>
-                <label for="name">Name</label>
-            </div>
+<div class="mx-auto w-full max-w-3xl p-4 sm:p-6">
 
-            <div class="field-holder">
-                <input type="email" class="form-control" id="email" name="email" required>
-                <label for="email">Email</label>
-            </div>
+    <form action="{{ route('contact.submit') }}" method="POST" class="space-y-5 p-4 sm:p-6">
+        @csrf
+        
+        <h2 class="mb-6 text-lg uppercase">Contact Us</h2>
 
-            <div class="field-holder">
-                <textarea id="message" class="form-control" name="message" rows="5" required></textarea>
-                <label for="message">Message</label>
-            </div>
+        <div class="absolute -left-[10000px] top-auto h-px w-px overflow-hidden" aria-hidden="true">
+            <label for="website">Website</label>
+            <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+        </div>
 
-            <button class="btn btn-primary" type="submit">Send Message <i class="bi bi-arrow-right"></i></button>
-        </form>
+        <div class="flex flex-col gap-2">
+            <label for="name" class="text-xs uppercase tracking-wide">Name</label>
+            <input
+                type="text"
+                id="name"
+                name="name"
+                value="{{ old('name') }}"
+                class="w-full border border-black p-2 focus:outline-none"
+                required
+            >
+        </div>
 
-        @if(session('success'))
-            <div class="success-message">
-                Message sent. We will get back to you soon.  <br><a href="{{ route('home') }}">home <i class="bi bi-arrow-right"></i></a>
-            </div>
-        @endif
+        <div class="flex flex-col gap-2">
+            <label for="email" class="text-xs uppercase tracking-wide">Email</label>
+            <input
+                type="email"
+                id="email"
+                name="email"
+                value="{{ old('email') }}"
+                class="w-full border border-black p-2 focus:outline-none"
+                required
+            >
+        </div>
 
-    </div>
+        <div class="flex flex-col gap-2">
+            <label for="message" class="text-xs uppercase tracking-wide">Message</label>
+            <textarea
+                id="message"
+                name="message"
+                rows="6"
+                class="w-full border border-black p-2 focus:outline-none resize-none"
+                required
+            >{{ old('message') }}</textarea>
+        </div>
+
+        <div class="flex justify-end">
+            <button type="submit" class="border border-black bg-black text-white px-4 py-2 text-xs uppercase hover:bg-white hover:text-black">
+                Send Message
+            </button>
+        </div>
+    </form>
 </div>
-
-<script>
-    document.querySelectorAll('.field-holder input, .field-holder textarea').forEach(field => {
-        field.addEventListener('input', () => {
-            if (field.value.trim() !== "") {
-                field.classList.add('has-value');
-            } else {
-                field.classList.remove('has-value');
-            }
-        });
-
-        // Initialize class on page load for prefilled values
-        if (field.value.trim() !== "") {
-            field.classList.add('has-value');
-        }
-    });
-</script>
 
 @endsection

@@ -6,14 +6,4 @@
         <img src="{{ asset('assets/logo_green-white.svg') }}" alt="Logo" class="h-8">
     </a>
 
-    <div class="flex gap-4 ml-auto">
-        <a href="{{ route('documentation') }}">
-            <span class="text-black font-sans text-sm hover:underline hover:text-brand">API</span>
-        </a>
-
-        <a href="{{ route('contact') }}">
-            <span class="text-black font-sans text-sm hover:underline hover:text-brand">CONTACT</span>
-        </a>
-    </div>
-
 </nav>

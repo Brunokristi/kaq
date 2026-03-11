@@ -10,6 +10,9 @@ use App\Models\QrCodeType;
 
 
 Route::get('/', function () {
+    if (!request()->has('type')) {
+        return redirect()->route('home', ['type' => 2]);
+    }
     return view('dashboard');
 })->name('home');
 

@@ -11,16 +11,20 @@ class ContactController extends Controller
 {
     public function index()
     {
-        // Show the contact page
         return view('contact');
     }
 
     public function submit(Request $request)
     {
+        if (!empty($request->input('website'))) {
+            return back()->with('success', 'Message sent successfully!');
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email',
             'message' => 'required|string',
+            'website' => 'nullable|string|max:0',
         ]);
 
         // Send the email

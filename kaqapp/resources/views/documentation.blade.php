@@ -1,10 +1,58 @@
 @extends('layouts.app')
 
-@section('title', 'QR API Documentation')
+@section('title', 'API Documentation')
 
 @section('content')
-<div class="documentation">
-    <h1>QR Code Generator API Documentation</h1>
+<div class="documentation mx-auto w-full p-4 sm:p-6 text-black
+    [&_h1]:text-center
+    [&_h1]:mb-6
+    [&_h2]:mb-4
+    [&_h2]:text-sm
+    [&_h3]:mb-3
+    [&_p]:mb-4
+    [&_table]:w-full
+    [&_table]:border-collapse
+    [&_table]:mb-8
+    [&_table]:border
+    [&_table]:border-black
+    [&_th]:border
+    [&_th]:border-black
+    [&_th]:p-2
+    [&_th]:text-left
+    [&_th]:align-top
+    [&_td]:border
+    [&_td]:border-black
+    [&_td]:p-2
+    [&_td]:text-left
+    [&_td]:align-top
+    [&_td]:break-words
+    [&_th:first-child]:w-[200px]
+    [&_th:first-child]:whitespace-nowrap
+    [&_td:first-child]:w-[200px]
+    [&_td:first-child]:whitespace-nowrap
+    [&_code]:bg-brand
+    [&_code]:text-white
+    [&_code]:px-1.5
+    [&_code]:py-0.5
+    [&_code]:rounded-none
+    [&_pre]:bg-brand
+    [&_pre]:text-white
+    [&_pre]:border
+    [&_pre]:border-black
+    [&_pre]:p-4
+    [&_pre]:overflow-x-auto
+    [&_pre]:mb-4
+    [&_hr]:my-12
+    [&_a]:block
+    [&_a]:mx-auto
+    [&_a]:text-center
+    [&_a]:text-sm
+    [&_a]:text-brand
+    [&_a]:hover:underline
+    [&_i]:text-brand
+    [&_i]:ml-2
+    [&_i]:text-base">
+    <h2 class="mb-6 text-lg uppercase">QR Code Generator API Documentation</h2>
 
     <p>This API provides endpoints to generate QR codes for various use cases such as contact sharing, Wi-Fi credentials, calendar events, payments, social media, and map navigation. You can customize QR code styles and download them in SVG or PNG format.</p>
 
@@ -477,7 +525,7 @@
     <h2>Example Curl</h2>
 
     <div class="codehilite">
-    <pre><span></span>curl<span class="w"> </span><span class="s2">&quot;https://your-domain/qrcode?url=https://openai.com&amp;format=svg&quot;</span>
+    <pre><span></span>curl<span class="w"> </span><span class="s2">&quot;https://kaqapp/qrcode?url=https://openai.com&amp;format=svg&quot;</span>
     </pre>
     </div>
 
@@ -495,7 +543,7 @@
 
      
 
-    <h2 style="text-align: center; padding-top: 40px;">For any questions or suggestions</h2>
+    <h2 class="pt-10 text-center">For any questions or suggestions</h2>
     <a href="{{ route('contact') }}">get in touch with us <i class="bi bi-arrow-right"></i></a>
 </div>
 @endsection
