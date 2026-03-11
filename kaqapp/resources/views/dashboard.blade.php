@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'KAQ Dashboard - Create QR Codes')
+@section('title', 'Dashboard')
 
 @section('content')
 <div class="h-full min-h-0 flex flex-col lg:flex-row">

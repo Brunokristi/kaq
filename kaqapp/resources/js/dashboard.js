@@ -4,6 +4,16 @@ document.addEventListener('DOMContentLoaded', () => {
     let qrCodeBaseUrl = '/qrcode';
     const qrApiBaseUrl = window.kaqDashboardConfig?.qrApiBaseUrl || '';
 
+    const normalizeEndpointPath = (path) => {
+        const endpoint = (path || '/qrcode').trim();
+
+        if (!endpoint) {
+            return '/qrcode';
+        }
+
+        return endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    };
+
     const sidebarLinks = Array.from(document.querySelectorAll('#sidebar a[data-id]'));
     const mainContent = document.getElementById('main-content');
 
@@ -55,22 +65,51 @@ document.addEventListener('DOMContentLoaded', () => {
         return missing;
     };
 
+    const getCurrentQrImage = () => document.getElementById('qr-image');
+
+    const placeholderQrSrc = getCurrentQrImage()?.getAttribute('src') || '';
+
+    const showPlaceholderQr = () => {
+        const qrImage = getCurrentQrImage();
+
+        if (!qrImage || !placeholderQrSrc) {
+            return;
+        }
+
+        if (qrImage.getAttribute('src') !== placeholderQrSrc) {
+            qrImage.setAttribute('src', placeholderQrSrc);
+        }
+    };
+
     const updateQrCode = ({ notifyRequired = false } = {}) => {
         const activeLink = document.querySelector('#sidebar a[data-id].active');
         const typeId = activeLink ? activeLink.getAttribute('data-id') : null;
-        if (!typeId) return false;
+        if (!typeId) {
+            showPlaceholderQr();
+            return false;
+        }
 
         const missingRequiredFields = getMissingRequiredFields();
         if (missingRequiredFields.length) {
+            showPlaceholderQr();
             if (notifyRequired) {
                 showToast('error', `Please fill in required field: ${missingRequiredFields[0]}.`, 5000);
             }
             return false;
         }
 
+        const fieldNameAliases = {
+            phone_number: 'phone',
+        };
+
         const formData = {};
         document.querySelectorAll('#dynamic-form input, #dynamic-form textarea').forEach(field => {
             formData[field.name] = field.value;
+
+            const aliasedName = fieldNameAliases[field.name];
+            if (aliasedName) {
+                formData[aliasedName] = field.value;
+            }
         });
 
         const fill = normalizeHex(document.getElementById('pixelColorHex')?.value || '#47663B');
@@ -90,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
             typeId: typeId,
         }).toString();
 
-        const qrCodeUrl = `${qrApiBaseUrl}${qrCodeBaseUrl}?${queryParams}`;
+        const qrCodeUrl = `${qrApiBaseUrl}${normalizeEndpointPath(qrCodeBaseUrl)}?${queryParams}`;
 
         const qrCodeImage = document.getElementById('qr-image');
         if (qrCodeImage) {
@@ -99,8 +138,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         return true;
     };
-
-    const getCurrentQrImage = () => document.getElementById('qr-image');
 
     const getCurrentFormat = () => document.querySelector('input[name="format"]:checked')?.value || 'png';
 
@@ -293,6 +330,23 @@ document.addEventListener('DOMContentLoaded', () => {
         clicked.classList.add('active');
     };
 
+    const closeSidebarOnSmallDevices = () => {
+        if (!window.matchMedia('(max-width: 1023px)').matches) {
+            return;
+        }
+
+        const sidebar = document.getElementById('sidebar');
+        const toggle = document.getElementById('menu-toggle');
+
+        if (!sidebar || sidebar.classList.contains('w-0')) {
+            return;
+        }
+
+        sidebar.classList.remove('w-72', 'w-64');
+        sidebar.classList.add('w-0');
+        toggle?.classList.remove('bi-x');
+    };
+
     const attachFormListeners = () => {
         const form = document.getElementById('dynamic-form');
         if (!form) return;
@@ -309,6 +363,8 @@ document.addEventListener('DOMContentLoaded', () => {
             event.preventDefault();
 
             setActive(link);
+            closeSidebarOnSmallDevices();
+            showPlaceholderQr();
 
             const typeId = link.getAttribute('data-id');
 
@@ -363,7 +419,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </form>
                     `;
 
-                    qrCodeBaseUrl = data.url || '/qrcode';
+                    qrCodeBaseUrl = normalizeEndpointPath(data.url);
 
                     const text = document.getElementById('text');
                     const toggleButton = document.getElementById('toggle-button');
@@ -381,6 +437,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 })
                 .catch(error => {
                     console.error(error);
+                    showPlaceholderQr();
                     showToast('error', 'Could not load this QR type. Please try again.', 5000);
                 });
         });

@@ -15,7 +15,7 @@
 
     <div class="flex items-center gap-2">
         <p class="text-xs text-brand">
-            qr code generation engine
+            qr code generator
         </p>
     </div>
 

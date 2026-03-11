@@ -54,405 +54,511 @@
     [&_i]:text-base">
     <h2 class="mb-6 text-lg uppercase">QR Code Generator API Documentation</h2>
 
-    <p>This API provides endpoints to generate QR codes for various use cases such as contact sharing, Wi-Fi credentials, calendar events, payments, social media, and map navigation. You can customize QR code styles and download them in SVG or PNG format.</p>
-
-    
-     
+    <p>This page reflects the current Flask API behavior. Unless noted otherwise, endpoints accept both query-string GET requests and JSON POST requests. Styling parameters such as <code>format</code>, <code>fill</code>, <code>background</code>, <code>box_size</code>, and <code>border</code> are supported across the generator endpoints below.</p>
 
     <h2>API Endpoints</h2>
 
     <h3>URL QR</h3>
 
     <table>
-    <thead>
-    <tr>
-    <th>Endpoint</th>
-    <th><code>/qrcode</code></th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-    <td>Description</td>
-    <td>Generates a QR code for a URL.</td>
-    </tr>
-    <tr>
-    <td>Parameters</td>
-    <td><code>url</code></td>
-    </tr>
-    <tr>
-    <td>Example</td>
-    <td><code>/qrcode?url=https://example.com&amp;format=png</code></td>
-    </tr>
-    </tbody>
+        <thead>
+            <tr>
+                <th>Endpoint</th>
+                <th><code>/qrcode</code></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Methods</td>
+                <td><code>GET</code> only</td>
+            </tr>
+            <tr>
+                <td>Description</td>
+                <td>Generates a QR code for a URL.</td>
+            </tr>
+            <tr>
+                <td>Parameters</td>
+                <td><code>url</code> (optional, defaults to Google), <code>error_correction</code>, plus styling parameters</td>
+            </tr>
+            <tr>
+                <td>Example</td>
+                <td><code>/qrcode?url=https://example.com&amp;format=png</code></td>
+            </tr>
+        </tbody>
     </table>
-
-     
 
     <h3>Wi-Fi</h3>
 
     <table>
-    <thead>
-    <tr>
-    <th>Endpoint</th>
-    <th><code>/wifi</code></th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-    <td>Description</td>
-    <td>Share Wi-Fi credentials using QR code.</td>
-    </tr>
-    <tr>
-    <td>Parameters</td>
-    <td><code>ssid</code> (required), <code>password</code>, <code>encryption</code>, <code>hidden</code></td>
-    </tr>
-    <tr>
-    <td>Example</td>
-    <td><code>POST /wifi</code> with JSON: <code>{ "ssid": "Home", "password": "12345678" }</code></td>
-    </tr>
-    </tbody>
+        <thead>
+            <tr>
+                <th>Endpoint</th>
+                <th><code>/wifi</code></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Methods</td>
+                <td><code>GET</code>, <code>POST</code></td>
+            </tr>
+            <tr>
+                <td>Description</td>
+                <td>Shares Wi-Fi credentials in QR format.</td>
+            </tr>
+            <tr>
+                <td>Parameters</td>
+                <td><code>ssid</code> (required), <code>password</code> (optional), <code>encryption</code> (optional, default <code>WPA</code>), <code>hidden</code> (optional, <code>true</code>/<code>false</code>)</td>
+            </tr>
+            <tr>
+                <td>Example</td>
+                <td><code>/wifi?ssid=Home&amp;password=12345678&amp;encryption=WPA</code></td>
+            </tr>
+        </tbody>
     </table>
-
-     
 
     <h3>vCard Contact</h3>
 
     <table>
-    <thead>
-    <tr>
-    <th>Endpoint</th>
-    <th><code>/vcard</code></th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-    <td>Description</td>
-    <td>Share contact details as vCard.</td>
-    </tr>
-    <tr>
-    <td>Parameters</td>
-    <td><code>name</code>, <code>phone</code> (required), <code>email</code>, <code>company</code>, <code>title</code>, <code>website</code>, <code>address</code></td>
-    </tr>
-    <tr>
-    <td>Example</td>
-    <td><code>POST /vcard</code> with JSON: <code>{ "name": "John Doe", "phone": "+421900000000" }</code></td>
-    </tr>
-    </tbody>
+        <thead>
+            <tr>
+                <th>Endpoint</th>
+                <th><code>/vcard</code></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Methods</td>
+                <td><code>GET</code>, <code>POST</code></td>
+            </tr>
+            <tr>
+                <td>Description</td>
+                <td>Generates a vCard QR code.</td>
+            </tr>
+            <tr>
+                <td>Parameters</td>
+                <td><code>name</code> (required), <code>phone</code> (required), <code>email</code>, <code>company</code>, <code>title</code>, <code>website</code>, <code>address</code></td>
+            </tr>
+            <tr>
+                <td>Example</td>
+                <td><code>/vcard?name=John%20Doe&amp;phone=%2B421900000000</code></td>
+            </tr>
+        </tbody>
     </table>
-
-     
 
     <h3>WhatsApp</h3>
 
     <table>
-    <thead>
-    <tr>
-    <th>Endpoint</th>
-    <th><code>/whatsapp</code></th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-    <td>Description</td>
-    <td>Send predefined WhatsApp message.</td>
-    </tr>
-    <tr>
-    <td>Parameters</td>
-    <td><code>phone</code>, <code>message</code></td>
-    </tr>
-    <tr>
-    <td>Example</td>
-    <td><code>/whatsapp?phone=0900123456&amp;message=Hi!</code></td>
-    </tr>
-    </tbody>
+        <thead>
+            <tr>
+                <th>Endpoint</th>
+                <th><code>/whatsapp</code></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Methods</td>
+                <td><code>GET</code>, <code>POST</code></td>
+            </tr>
+            <tr>
+                <td>Description</td>
+                <td>Generates a WhatsApp message link QR code. Phone numbers are normalized before building the URL.</td>
+            </tr>
+            <tr>
+                <td>Parameters</td>
+                <td><code>phone</code> (optional), <code>message</code> (optional, default <code>Hello!</code>)</td>
+            </tr>
+            <tr>
+                <td>Example</td>
+                <td><code>/whatsapp?phone=0900123456&amp;message=Hi!</code></td>
+            </tr>
+        </tbody>
     </table>
-
-     
 
     <h3>Email</h3>
 
     <table>
-    <thead>
-    <tr>
-    <th>Endpoint</th>
-    <th><code>/email</code></th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-    <td>Description</td>
-    <td>Compose an email using a QR code.</td>
-    </tr>
-    <tr>
-    <td>Parameters</td>
-    <td><code>recipient</code>, <code>subject</code>, <code>body</code></td>
-    </tr>
-    <tr>
-    <td>Example</td>
-    <td><code>POST /email</code> with JSON: <code>{ "recipient": "user@example.com", "subject": "Hi" }</code></td>
-    </tr>
-    </tbody>
+        <thead>
+            <tr>
+                <th>Endpoint</th>
+                <th><code>/email</code></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Methods</td>
+                <td><code>GET</code>, <code>POST</code></td>
+            </tr>
+            <tr>
+                <td>Description</td>
+                <td>Generates a <code>mailto:</code> QR code.</td>
+            </tr>
+            <tr>
+                <td>Parameters</td>
+                <td><code>recipient</code> (optional), <code>subject</code> (optional), <code>body</code> (optional)</td>
+            </tr>
+            <tr>
+                <td>Example</td>
+                <td><code>/email?recipient=user@example.com&amp;subject=Hi&amp;body=Hello</code></td>
+            </tr>
+        </tbody>
     </table>
-
-     
 
     <h3>Call</h3>
 
     <table>
-    <thead>
-    <tr>
-    <th>Endpoint</th>
-    <th><code>/call</code></th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-    <td>Description</td>
-    <td>Dial a number from QR code.</td>
-    </tr>
-    <tr>
-    <td>Parameters</td>
-    <td><code>phone</code></td>
-    </tr>
-    <tr>
-    <td>Example</td>
-    <td><code>/call?phone=123456789</code></td>
-    </tr>
-    </tbody>
+        <thead>
+            <tr>
+                <th>Endpoint</th>
+                <th><code>/call</code></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Methods</td>
+                <td><code>GET</code>, <code>POST</code></td>
+            </tr>
+            <tr>
+                <td>Description</td>
+                <td>Generates a phone dial QR code.</td>
+            </tr>
+            <tr>
+                <td>Parameters</td>
+                <td><code>phone</code> (optional, default <code>123456789</code>)</td>
+            </tr>
+            <tr>
+                <td>Example</td>
+                <td><code>/call?phone=123456789</code></td>
+            </tr>
+        </tbody>
     </table>
-
-     
 
     <h3>SMS</h3>
 
     <table>
-    <thead>
-    <tr>
-    <th>Endpoint</th>
-    <th><code>/sms</code></th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-    <td>Description</td>
-    <td>Send SMS with predefined message.</td>
-    </tr>
-    <tr>
-    <td>Parameters</td>
-    <td><code>phone</code>, <code>message</code></td>
-    </tr>
-    <tr>
-    <td>Example</td>
-    <td><code>/sms?phone=123456789&amp;message=Hello</code></td>
-    </tr>
-    </tbody>
+        <thead>
+            <tr>
+                <th>Endpoint</th>
+                <th><code>/sms</code></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Methods</td>
+                <td><code>GET</code>, <code>POST</code></td>
+            </tr>
+            <tr>
+                <td>Description</td>
+                <td>Generates an SMS link QR code.</td>
+            </tr>
+            <tr>
+                <td>Parameters</td>
+                <td><code>phone</code> (optional, default <code>123456789</code>), <code>message</code> (optional, default <code>Hello!</code>)</td>
+            </tr>
+            <tr>
+                <td>Example</td>
+                <td><code>/sms?phone=123456789&amp;message=Hello</code></td>
+            </tr>
+        </tbody>
     </table>
 
+    <h3>Social &amp; Sharing</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Endpoint</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>/discord</code></td>
+                <td><code>server_id</code> and <code>channel_id</code> are optional. Generates a <code>discord://</code> channel link.</td>
+            </tr>
+            <tr>
+                <td><code>/discord_invite</code></td>
+                <td><code>invite_code</code> is optional. Example: <code>/discord_invite?invite_code=myserver</code></td>
+            </tr>
+            <tr>
+                <td><code>/messenger</code></td>
+                <td><code>username</code> is optional. Generates <code>https://m.me/{username}</code>.</td>
+            </tr>
+            <tr>
+                <td><code>/facebook_page</code></td>
+                <td><code>page</code> is optional. Generates <code>https://facebook.com/{page}</code>.</td>
+            </tr>
+        </tbody>
+    </table>
 
     <h3>PayBySquare</h3>
 
     <table>
-    <thead>
-    <tr>
-    <th>Endpoint</th>
-    <th><code>/paybysquare</code></th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-    <td>Description</td>
-    <td>Slovak bank QR payments.</td>
-    </tr>
-    <tr>
-    <td>Parameters</td>
-    <td><code>amount</code>, <code>currency</code>, <code>iban</code>, <code>note</code>, <code>symbols</code></td>
-    </tr>
-    <tr>
-    <td>Example</td>
-    <td><code>POST /paybysquare</code> with JSON: <code>{ "amount": "12.50", "currency": "EUR", "iban": "SK12..." }</code></td>
-    </tr>
-    </tbody>
+        <thead>
+            <tr>
+                <th>Endpoint</th>
+                <th><code>/paybysquare</code></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Methods</td>
+                <td><code>GET</code>, <code>POST</code></td>
+            </tr>
+            <tr>
+                <td>Description</td>
+                <td>Generates a Slovak PayBySquare payment QR code.</td>
+            </tr>
+            <tr>
+                <td>Parameters</td>
+                <td><code>amount</code> (required), <code>currency</code> (required), <code>iban</code> (required), <code>date</code>, <code>variable_symbol</code>, <code>constant_symbol</code>, <code>specific_symbol</code>, <code>note</code>, <code>swift</code></td>
+            </tr>
+            <tr>
+                <td>Example</td>
+                <td><code>/paybysquare?amount=12.50&amp;currency=EUR&amp;iban=SK1234567890123456789012&amp;date=20240101</code></td>
+            </tr>
+        </tbody>
     </table>
-
-     
 
     <h3>QR Platba (CZ)</h3>
 
     <table>
-    <thead>
-    <tr>
-    <th>Endpoint</th>
-    <th><code>/qrplatba</code></th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-    <td>Description</td>
-    <td>Czech payment format (SPD).</td>
-    </tr>
-    <tr>
-    <td>Parameters</td>
-    <td><code>iban</code>, <code>amount</code>, <code>currency</code>, <code>message</code>, <code>variable_symbol</code></td>
-    </tr>
-    <tr>
-    <td>Example</td>
-    <td><code>/qrplatba?iban=CZ12...&amp;amount=120</code></td>
-    </tr>
-    </tbody>
+        <thead>
+            <tr>
+                <th>Endpoint</th>
+                <th><code>/qrplatba</code></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Methods</td>
+                <td><code>GET</code>, <code>POST</code></td>
+            </tr>
+            <tr>
+                <td>Description</td>
+                <td>Generates a Czech SPD payment QR code.</td>
+            </tr>
+            <tr>
+                <td>Parameters</td>
+                <td><code>iban</code> (required), <code>amount</code> (required), <code>currency</code> (optional, default <code>CZK</code>), <code>message</code>, <code>variable_symbol</code></td>
+            </tr>
+            <tr>
+                <td>Example</td>
+                <td><code>/qrplatba?iban=CZ5855000000001265098001&amp;amount=120</code></td>
+            </tr>
+        </tbody>
     </table>
-
-     
 
     <h3>SEPA Payment</h3>
 
     <table>
-    <thead>
-    <tr>
-    <th>Endpoint</th>
-    <th><code>/sepa</code></th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-    <td>Description</td>
-    <td>EU SEPA credit transfer.</td>
-    </tr>
-    <tr>
-    <td>Parameters</td>
-    <td><code>creditor_name</code>, <code>iban</code>, <code>bic</code>, <code>amount</code>, <code>reference</code>, <code>remittance_information</code></td>
-    </tr>
-    <tr>
-    <td>Example</td>
-    <td><code>POST /sepa</code> with JSON: <code>{ "iban": "SK12...", "amount": "25.00" }</code></td>
-    </tr>
-    </tbody>
+        <thead>
+            <tr>
+                <th>Endpoint</th>
+                <th><code>/sepa</code></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Methods</td>
+                <td><code>GET</code>, <code>POST</code></td>
+            </tr>
+            <tr>
+                <td>Description</td>
+                <td>Generates an EPC/SEPA payment QR code. This endpoint has server-side fallbacks for missing values.</td>
+            </tr>
+            <tr>
+                <td>Parameters</td>
+                <td><code>creditor_name</code>, <code>iban</code>, <code>bic</code>, <code>amount</code>, <code>reference</code>, <code>remittance_information</code></td>
+            </tr>
+            <tr>
+                <td>Example</td>
+                <td><code>/sepa?creditor_name=Acme&amp;iban=SK6802000000001234567890&amp;bic=UNCRSKBX&amp;amount=25.00</code></td>
+            </tr>
+        </tbody>
     </table>
 
-     
-
-    <h3>Revolut &amp; PayPal</h3>
+    <h3>Revolut</h3>
 
     <table>
-    <thead>
-    <tr>
-    <th>Endpoint</th>
-    <th><code>/revolut</code>, <code>/paypal</code></th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-    <td>Description</td>
-    <td>QR codes for Revolut or PayPal payments.</td>
-    </tr>
-    <tr>
-    <td>Parameters</td>
-    <td><code>username</code>, <code>amount</code></td>
-    </tr>
-    <tr>
-    <td>Example</td>
-    <td><code>/paypal?username=abc&amp;amount=12</code></td>
-    </tr>
-    </tbody>
+        <thead>
+            <tr>
+                <th>Endpoint</th>
+                <th><code>/revolut</code></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Methods</td>
+                <td><code>GET</code>, <code>POST</code></td>
+            </tr>
+            <tr>
+                <td>Description</td>
+                <td>Generates a QR code for a Revolut profile URL.</td>
+            </tr>
+            <tr>
+                <td>Parameters</td>
+                <td><code>username</code> (optional, default <code>defaultuser</code>)</td>
+            </tr>
+            <tr>
+                <td>Example</td>
+                <td><code>/revolut?username=yourname</code></td>
+            </tr>
+        </tbody>
     </table>
 
-     
+    <h3>PayPal</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Endpoint</th>
+                <th><code>/paypal</code></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Methods</td>
+                <td><code>GET</code>, <code>POST</code></td>
+            </tr>
+            <tr>
+                <td>Description</td>
+                <td>Generates a PayPal.Me QR code.</td>
+            </tr>
+            <tr>
+                <td>Parameters</td>
+                <td><code>username</code> (required), <code>amount</code> (optional numeric value)</td>
+            </tr>
+            <tr>
+                <td>Example</td>
+                <td><code>/paypal?username=abc&amp;amount=12</code></td>
+            </tr>
+        </tbody>
+    </table>
 
     <h3>Event (Calendar)</h3>
 
     <table>
-    <thead>
-    <tr>
-    <th>Endpoint</th>
-    <th><code>/event</code></th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-    <td>Description</td>
-    <td>iCalendar format for one-time event.</td>
-    </tr>
-    <tr>
-    <td>Parameters</td>
-    <td><code>title</code>, <code>start</code>, <code>end</code>, <code>location</code>, <code>description</code></td>
-    </tr>
-    <tr>
-    <td>Example</td>
-    <td><code>POST /event</code> with JSON: <code>{ "title": "Meeting", "start": "2025-06-01T10:00", "end": "2025-06-01T11:00" }</code></td>
-    </tr>
-    </tbody>
+        <thead>
+            <tr>
+                <th>Endpoint</th>
+                <th><code>/event</code></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Methods</td>
+                <td><code>GET</code>, <code>POST</code></td>
+            </tr>
+            <tr>
+                <td>Description</td>
+                <td>Generates a one-time iCalendar event QR code.</td>
+            </tr>
+            <tr>
+                <td>Parameters</td>
+                <td><code>title</code> (optional), <code>start</code> (required, <code>YYYY-MM-DDTHH:MM</code>), <code>end</code> (required, <code>YYYY-MM-DDTHH:MM</code>), <code>location</code>, <code>description</code></td>
+            </tr>
+            <tr>
+                <td>Example</td>
+                <td><code>/event?title=Meeting&amp;start=2025-06-01T10:00&amp;end=2025-06-01T11:00</code></td>
+            </tr>
+        </tbody>
     </table>
 
-     
-     
+    <h3>Recurring Event</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Endpoint</th>
+                <th><code>/recurring_event</code></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Methods</td>
+                <td><code>GET</code>, <code>POST</code></td>
+            </tr>
+            <tr>
+                <td>Description</td>
+                <td>Generates a recurring iCalendar event QR code.</td>
+            </tr>
+            <tr>
+                <td>Parameters</td>
+                <td><code>summary</code>, <code>start_date</code>, <code>end_date</code>, <code>location</code>, <code>description</code>, <code>rrule</code> (all optional; defaults are applied)</td>
+            </tr>
+            <tr>
+                <td>Example</td>
+                <td><code>/recurring_event?summary=Standup&amp;start_date=20250110T090000Z&amp;end_date=20250110T093000Z&amp;rrule=FREQ=WEEKLY;COUNT=10</code></td>
+            </tr>
+        </tbody>
+    </table>
 
     <h3>Meeting Links</h3>
 
     <table>
-    <thead>
-    <tr>
-    <th>Endpoint</th>
-    <th><code>/google_meet</code>, <code>/microsoft_meeting</code>, <code>/zoom_meeting</code></th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-    <td>Description</td>
-    <td>Generate QR code for online meeting links.</td>
-    </tr>
-    <tr>
-    <td>Parameters</td>
-    <td><code>meeting_url</code></td>
-    </tr>
-    </tbody>
+        <thead>
+            <tr>
+                <th>Endpoint</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>/google_meet</code></td>
+                <td><code>meeting_url</code> is required and must start with <code>https://meet.google.com/</code>.</td>
+            </tr>
+            <tr>
+                <td><code>/microsoft_meeting</code></td>
+                <td><code>meeting_url</code> is required and must start with <code>https://teams.microsoft.com/l/</code>.</td>
+            </tr>
+            <tr>
+                <td><code>/zoom_meeting</code></td>
+                <td><code>meeting_url</code> is accepted and passed through directly. Example: <code>/zoom_meeting?meeting_url=https://zoom.us/j/123456789</code></td>
+            </tr>
+        </tbody>
     </table>
 
-     
-
-    <h3>Google/Apple Maps Location</h3>
+    <h3>Google / Apple Maps Location</h3>
 
     <table>
-    <thead>
-    <tr>
-    <th>Endpoint</th>
-    <th><code>/google_maps</code>, <code>/apple_maps</code></th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-    <td>Description</td>
-    <td>Show a place on map.</td>
-    </tr>
-    <tr>
-    <td>Parameters</td>
-    <td><code>latitude</code>, <code>longitude</code>, <code>address</code></td>
-    </tr>
-    </tbody>
+        <thead>
+            <tr>
+                <th>Endpoint</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>/google_maps</code></td>
+                <td>Requires either both <code>latitude</code> and <code>longitude</code>, or <code>address</code>.</td>
+            </tr>
+            <tr>
+                <td><code>/apple_maps</code></td>
+                <td>Requires either both <code>latitude</code> and <code>longitude</code>, or <code>address</code>.</td>
+            </tr>
+        </tbody>
     </table>
 
-     
-
-    <h3>Google/Apple Maps Route</h3>
+    <h3>Google / Apple Maps Route</h3>
 
     <table>
-    <thead>
-    <tr>
-    <th>Endpoint</th>
-    <th><code>/google_maps_route</code>, <code>/apple_maps_route</code></th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-    <td>Description</td>
-    <td>Show route on map from start to destination.</td>
-    </tr>
-    <tr>
-    <td>Parameters</td>
-    <td><code>start</code>, <code>destination</code>, <code>stops</code></td>
-    </tr>
-    </tbody>
+        <thead>
+            <tr>
+                <th>Endpoint</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>/google_maps_route</code></td>
+                <td><code>start</code>, <code>destination</code>, <code>stops</code> (comma-separated). If omitted, defaults are applied for start and destination.</td>
+            </tr>
+            <tr>
+                <td><code>/apple_maps_route</code></td>
+                <td><code>start</code>, <code>destination</code>, <code>stops</code> (comma-separated). If omitted, defaults are applied for start and destination.</td>
+            </tr>
+        </tbody>
     </table>
-
-     
 
     <h2>Error Codes</h2>
 
@@ -525,14 +631,14 @@
     <h2>Example Curl</h2>
 
     <div class="codehilite">
-    <pre><span></span>curl<span class="w"> </span><span class="s2">&quot;https://kaqapp/qrcode?url=https://openai.com&amp;format=svg&quot;</span>
+    <pre><span></span>curl<span class="w"> </span><span class="s2">&quot;http://127.0.0.1:5001/qrcode?url=https://kaqapp.com&amp;format=svg&quot;</span>
     </pre>
     </div>
 
     <h2>Example JSON POST</h2>
 
     <div class="codehilite">
-    <pre><span></span><span class="err">POST</span><span class="w"> </span><span class="err">/wi</span><span class="kc">f</span><span class="err">i</span>
+    <pre><span></span><span class="err">POST</span><span class="w"> </span><span class="err">/wifi</span>
     <span class="p">{</span>
     <span class="w">  </span><span class="nt">&quot;ssid&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;MyWiFi&quot;</span><span class="p">,</span>
     <span class="w">  </span><span class="nt">&quot;password&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;mypassword&quot;</span><span class="p">,</span>

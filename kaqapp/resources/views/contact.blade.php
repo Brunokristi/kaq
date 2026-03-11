@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Contact Us')
+@section('title', 'Contact')
 
 @section('content')
 <div class="mx-auto w-full max-w-3xl p-4 sm:p-6">

@@ -5,7 +5,7 @@
         <div class="flex items-center justify-center h-60">
             <img
                 id="qr-image"
-                src="{{ asset('assets/placeholder.png') }}"
+                src="{{ asset('assets/placeholder.svg') }}"
                 alt="QR Code"
                 class="max-h-full"
             >

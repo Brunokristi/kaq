@@ -28,7 +28,7 @@
         <x-navbar />
 
         <main class="flex flex-1 min-h-0">
-            <div id="sidebar" class="w-72 border-r border-black overflow-y-auto min-h-0 transition-all duration-300">
+            <div id="sidebar" class="w-0 border-r border-black overflow-y-auto min-h-0 transition-all duration-300">
                 <x-sidebar />
             </div>
 
